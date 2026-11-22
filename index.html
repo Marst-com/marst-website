@@ -1,0 +1,94 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#ffffff">
+
+    <title>Marst — Official</title>
+    <meta name="description" content="Marst의 공식 웹사이트입니다.">
+
+    <link rel="stylesheet" href="css/style.css">
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+    <div id="app">
+        <header class="header">
+            <a href="/" class="logo">
+                <span class="logo-mark">M</span>
+                <span>Marst</span>
+            </a>
+
+            <span class="header-label">OFFICIAL WEBSITE</span>
+        </header>
+
+        <main class="main">
+
+            <section class="hero">
+                <div class="hero-label">
+                    <span class="status-dot"></span>
+                    MARST OFFICIAL
+                </div>
+
+                <h1>
+                    안녕하세요,<br>
+                    <span class="gradient-text">Marst입니다.</span>
+                </h1>
+
+                <p class="hero-description">
+                    Marst의 다양한 활동과 프로젝트를 만나보세요.
+                </p>
+            </section>
+
+            <section class="links-section">
+                <div class="section-heading">
+                    <div>
+                        <h2>바로가기</h2>
+                        <p>Marst의 웹사이트와 프로젝트</p>
+                    </div>
+
+                    <span id="link-count" class="link-count">0 LINKS</span>
+                </div>
+
+                <div id="links-container">
+                    <div class="loading-placeholder">
+                        링크를 불러오는 중...
+                    </div>
+                </div>
+            </section>
+
+        </main>
+
+        <footer class="footer">
+            <div class="footer-logo">Marst</div>
+            <p>© <span id="year"></span> Marst. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <div id="navigation-loader" class="navigation-loader">
+        <div class="loader-content">
+            <div class="loader-spinner"></div>
+            <h2>이동 중입니다</h2>
+            <p id="loader-message">잠시만 기다려 주세요.</p>
+        </div>
+    </div>
+
+    <div id="error-container" class="error-container hidden">
+        <div class="error-icon">
+            <i data-lucide="alert-circle"></i>
+        </div>
+        <h2>페이지를 불러오지 못했습니다.</h2>
+        <p id="error-message">잠시 후 다시 시도해 주세요.</p>
+        <button onclick="location.reload()">다시 시도</button>
+    </div>
+
+    <script src="js/loader.js"></script>
+    <script src="js/router.js"></script>
+    <script src="js/renderer.js"></script>
+    <script src="js/app.js"></script>
+
+</body>
+</html>
