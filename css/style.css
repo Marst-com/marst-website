@@ -597,6 +597,8 @@ button {
 }
 
 .result-card {
+  left: 50%;
+  top: 50%;
   position: absolute;
   width: 245px;
   padding: 12px;
