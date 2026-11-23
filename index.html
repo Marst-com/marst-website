@@ -4,205 +4,422 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#080910">
   <title>Marst — Ideas become Something more.</title>
-  <meta name="description" content="Marst 공식 홈페이지. Ideas become Something more.">
+  <meta name="description" content="Ideas become Something more. Marst 공식 사이트">
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-  <!-- Navigation -->
-  <header class="navbar" id="navbar">
-    <a class="brand" href="index.html">
-      <span class="brand-mark">M</span>
+  <!-- NAV -->
+  <header class="header">
+    <a href="index.html" class="logo">
+      <span class="logo-icon">M</span>
       <span>MARST</span>
     </a>
 
-    <nav class="nav-links">
-      <a class="active" href="index.html">홈</a>
-      <a href="history.html">역사</a>
-      <a href="links.html">바로가기</a>
-      <a href="purchase.html" data-protected>구매</a>
-      <a href="consult.html" data-protected>상담</a>
+    <nav class="nav" id="nav">
+      <a href="index.html" class="selected">Home</a>
+      <a href="history.html">History</a>
+      <a href="links.html">Quick Links</a>
+      <a href="purchase.html" data-auth>Purchase</a>
+      <a href="consult.html" data-auth>Consult</a>
     </nav>
 
-    <a class="nav-login" href="login.html" id="loginLink">로그인 ↗</a>
-    <button class="menu-toggle" id="menuToggle" aria-label="메뉴 열기">☰</button>
+    <div class="header-right">
+      <a href="login.html" class="login-button">Sign in <span>↗</span></a>
+      <button class="menu-button" id="menuButton">☰</button>
+    </div>
   </header>
 
-  <!-- Scroll-driven cinematic section -->
-  <main>
-    <section class="cinematic" id="cinematic">
-      <div class="sticky-stage">
-        <canvas id="scene"></canvas>
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg-glow"></div>
+    <div class="hero-grid"></div>
 
-        <div class="scene-vignette"></div>
-        <div class="scene-grain"></div>
-
-        <div class="top-caption">
-          <span>INDEPENDENT CREATIVE STUDIO</span>
-          <span id="sceneCounter">01 / 05</span>
-        </div>
-
-        <div class="progress-track">
-          <div class="progress-bar" id="progressBar"></div>
-        </div>
-
-        <!-- Scene 1 -->
-        <div class="scene-copy scene-1 active" data-scene="0">
-          <div class="eyebrow"><span class="dot"></span> WELCOME TO MARST</div>
-          <h1 class="hero-title">
-            Ideas become<br>
-            <span class="gradient-text">Something more.</span>
-          </h1>
-          <p class="hero-desc">
-            하나의 생각이 새로운 가능성이 되고,<br>
-            가능성이 실제 결과물로 이어지는 곳.
-          </p>
-          <div class="scroll-hint">
-            <span>SCROLL TO EXPLORE</span>
-            <span class="scroll-arrow">↓</span>
-          </div>
-        </div>
-
-        <!-- Scene 2 -->
-        <div class="scene-copy scene-2" data-scene="1">
-          <div class="eyebrow">01 — THE BEGINNING</div>
-          <h2>모든 것은<br><span class="gradient-text">작은 생각</span>에서 시작됩니다.</h2>
-          <p>
-            거창한 계획이 아니어도 괜찮습니다.<br>
-            불편함에서 발견한 아이디어 하나,<br>
-            궁금증에서 시작된 질문 하나.
-          </p>
-        </div>
-
-        <!-- Scene 3 -->
-        <div class="scene-copy scene-3" data-scene="2">
-          <div class="eyebrow">02 — THE PROCESS</div>
-          <h2>생각을 넘어<br><span class="gradient-text">직접 만들어갑니다.</span></h2>
-          <p>
-            기술을 탐구하고, 문제를 해결하고,<br>
-            새로운 시도를 반복하며<br>
-            아이디어를 실제 모습으로 바꿉니다.
-          </p>
-          <div class="process-tags">
-            <span>IDEA</span>
-            <span>DESIGN</span>
-            <span>DEVELOP</span>
-            <span>CREATE</span>
-          </div>
-        </div>
-
-        <!-- Scene 4 -->
-        <div class="scene-copy scene-4" data-scene="3">
-          <div class="eyebrow">03 — THE RESULT</div>
-          <h2>그리고 마침내,<br><span class="gradient-text">결과물이 만들어집니다.</span></h2>
-          <p>
-            단순히 상상하는 것에서 끝나지 않고,<br>
-            작동하는 서비스와 프로젝트,<br>
-            새로운 경험을 만들어냅니다.
-          </p>
-        </div>
-
-        <!-- Scene 5 -->
-        <div class="scene-copy scene-5" data-scene="4">
-          <div class="eyebrow">04 — WHAT'S NEXT?</div>
-          <h2>다음 가능성은<br><span class="gradient-text">지금부터.</span></h2>
-          <p>
-            Marst가 만들어가는 것들을 만나보세요.
-          </p>
-          <a href="links.html" class="scene-button">
-            Explore Marst <span>↗</span>
-          </a>
-        </div>
-
-        <div class="side-label">
-          <span>MARST</span>
-          <span class="side-line"></span>
-          <span id="sideSceneName">INTRODUCTION</span>
-        </div>
+    <div class="hero-content">
+      <div class="hero-label">
+        <span class="live-dot"></span>
+        INDEPENDENT CREATIVE STUDIO
       </div>
 
-      <!-- Scroll space drives animation -->
-      <div class="scroll-space" aria-hidden="true">
-        <div class="scroll-step"></div>
-        <div class="scroll-step"></div>
-        <div class="scroll-step"></div>
-        <div class="scroll-step"></div>
-        <div class="scroll-step"></div>
-      </div>
-    </section>
+      <h1>
+        Ideas become<br>
+        <span class="text-gradient">Something more.</span>
+      </h1>
 
-    <!-- Content after cinematic -->
-    <section class="after-cinematic">
-      <div class="section-heading">
-        <div class="eyebrow">DISCOVER MARST</div>
-        <h2>Explore<br><span class="gradient-text">what we do.</span></h2>
-        <p>Marst의 다양한 공간을 탐험해 보세요.</p>
-      </div>
+      <p class="hero-description">
+        생각을 아이디어로, 아이디어를 현실로.<br>
+        Marst는 다양한 가능성을 직접 만들어갑니다.
+      </p>
 
-      <div class="explore-grid">
-        <a class="explore-card card-history" href="history.html">
-          <div class="card-number">01</div>
-          <div class="card-art art-history"><span>↗</span></div>
-          <div class="card-info">
-            <div>
-              <h3>History</h3>
-              <p>Marst의 시작과 기록</p>
-            </div>
-            <span class="card-arrow">↗</span>
-          </div>
+      <div class="hero-actions">
+        <a href="#showcase" class="primary-button">
+          Discover Marst <span>↗</span>
         </a>
-
-        <a class="explore-card card-links" href="links.html">
-          <div class="card-number">02</div>
-          <div class="card-art art-links"><span>⌘</span></div>
-          <div class="card-info">
-            <div>
-              <h3>Quick Links</h3>
-              <p>프로젝트와 다양한 서비스</p>
-            </div>
-            <span class="card-arrow">↗</span>
-          </div>
-        </a>
-
-        <a class="explore-card card-purchase" href="purchase.html" data-protected>
-          <div class="card-number">03</div>
-          <div class="card-art art-purchase"><span>◇</span></div>
-          <div class="card-info">
-            <div>
-              <h3>Store</h3>
-              <p>제품과 서비스 둘러보기</p>
-            </div>
-            <span class="card-arrow">↗</span>
-          </div>
-        </a>
-
-        <a class="explore-card card-consult" href="consult.html" data-protected>
-          <div class="card-number">04</div>
-          <div class="card-art art-consult"><span>✳</span></div>
-          <div class="card-info">
-            <div>
-              <h3>Contact</h3>
-              <p>문의 및 상담하기</p>
-            </div>
-            <span class="card-arrow">↗</span>
-          </div>
+        <a href="history.html" class="secondary-button">
+          Our story
         </a>
       </div>
-    </section>
+    </div>
 
-    <section class="final-banner">
-      <div class="eyebrow">THE NEXT IDEA STARTS HERE</div>
-      <h2>Make it<br><span class="gradient-text">something more.</span></h2>
-      <a href="history.html" class="scene-button">Discover Marst <span>↗</span></a>
-    </section>
-  </main>
+    <div class="hero-bottom">
+      <span>SCROLL TO EXPLORE</span>
+      <div class="scroll-line"><span></span></div>
+      <span>01 — 05</span>
+    </div>
+  </section>
+
+  <!-- SCROLL VIDEO / SHOWCASE -->
+  <section class="showcase-scroll" id="showcase">
+    <div class="showcase-sticky">
+      <div class="showcase-background"></div>
+
+      <div class="showcase-heading" id="showcaseHeading">
+        <span class="eyebrow">ONE IDEA. COUNTLESS POSSIBILITIES.</span>
+        <h2>One space.<br><span class="text-gradient">Many creations.</span></h2>
+        <p>하나의 공간에서, 수많은 결과물이 만들어집니다.</p>
+      </div>
+
+      <!-- Main page/window -->
+      <div class="workspace" id="workspace">
+        <div class="workspace-topbar">
+          <div class="window-controls">
+            <span></span><span></span><span></span>
+          </div>
+          <div class="window-title">marst — workspace</div>
+          <div class="window-status"><span></span> LIVE</div>
+        </div>
+
+        <div class="workspace-body">
+          <div class="workspace-sidebar">
+            <div class="sidebar-brand">M.</div>
+            <div class="sidebar-icon active">⌂</div>
+            <div class="sidebar-icon">▤</div>
+            <div class="sidebar-icon">⌘</div>
+            <div class="sidebar-icon">◈</div>
+            <div class="sidebar-icon">⚙</div>
+          </div>
+
+          <div class="workspace-main">
+            <div class="workspace-welcome">
+              <div>
+                <span class="workspace-small">MARST CREATIVE SPACE</span>
+                <h3>Make something<br>extraordinary.</h3>
+              </div>
+              <div class="workspace-avatar">M</div>
+            </div>
+
+            <div class="workspace-grid">
+              <div class="mini-card mini-purple">
+                <div class="mini-card-label">PROJECT 01</div>
+                <div class="mini-art art-orb"></div>
+                <div class="mini-card-name">Creative Lab</div>
+                <div class="mini-card-sub">Visual exploration</div>
+              </div>
+
+              <div class="mini-card mini-blue">
+                <div class="mini-card-label">PROJECT 02</div>
+                <div class="mini-art art-code">
+                  <span>&lt;/&gt;</span>
+                </div>
+                <div class="mini-card-name">Development</div>
+                <div class="mini-card-sub">Building digital things</div>
+              </div>
+
+              <div class="mini-card mini-orange">
+                <div class="mini-card-label">PROJECT 03</div>
+                <div class="mini-art art-video">
+                  <div class="video-play">▶</div>
+                </div>
+                <div class="mini-card-name">Motion & Media</div>
+                <div class="mini-card-sub">Stories in motion</div>
+              </div>
+
+              <div class="mini-card mini-green">
+                <div class="mini-card-label">PROJECT 04</div>
+                <div class="mini-art art-product">
+                  <div class="product-shape"></div>
+                </div>
+                <div class="mini-card-name">New Ideas</div>
+                <div class="mini-card-sub">Something more</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Floating result cards -->
+        <div class="floating-results" id="floatingResults">
+
+          <div class="result-card result-web" data-result="web">
+            <div class="result-header">
+              <span class="result-icon purple">◈</span>
+              <span>WEB DESIGN</span>
+              <span class="result-dots">•••</span>
+            </div>
+            <div class="result-web-preview">
+              <div class="preview-nav"></div>
+              <div class="preview-hero"></div>
+              <div class="preview-columns">
+                <span></span><span></span><span></span>
+              </div>
+            </div>
+            <div class="result-caption">
+              <strong>Websites</strong>
+              <span>Digital experiences</span>
+            </div>
+          </div>
+
+          <div class="result-card result-code" data-result="code">
+            <div class="result-header">
+              <span class="result-icon blue">⌘</span>
+              <span>DEVELOPMENT</span>
+              <span class="result-dots">•••</span>
+            </div>
+            <div class="code-preview">
+              <div><i>01</i> <b>const</b> project = <em>"Marst"</em>;</div>
+              <div><i>02</i> project.<b>create</b>();</div>
+              <div><i>03</i> <span class="code-purple">return</span> ideas;</div>
+              <div><i>04</i> <span class="code-green">// make it real</span></div>
+            </div>
+            <div class="result-caption">
+              <strong>Software</strong>
+              <span>Ideas into code</span>
+            </div>
+          </div>
+
+          <div class="result-card result-video" data-result="video">
+            <div class="result-header">
+              <span class="result-icon orange">▶</span>
+              <span>CONTENT</span>
+              <span class="result-dots">•••</span>
+            </div>
+            <div class="video-preview">
+              <div class="video-mountain"></div>
+              <div class="video-preview-play">▶</div>
+              <div class="video-time">00:24 / 01:32</div>
+            </div>
+            <div class="result-caption">
+              <strong>Video & Media</strong>
+              <span>Stories and content</span>
+            </div>
+          </div>
+
+          <div class="result-card result-app" data-result="app">
+            <div class="result-header">
+              <span class="result-icon green">▦</span>
+              <span>APPLICATION</span>
+              <span class="result-dots">•••</span>
+            </div>
+            <div class="app-preview">
+              <div class="app-side"></div>
+              <div class="app-content">
+                <div class="app-content-head"></div>
+                <div class="app-stat-row">
+                  <span></span><span></span><span></span>
+                </div>
+                <div class="app-chart">
+                  <span></span><span></span><span></span><span></span>
+                  <span></span><span></span><span></span><span></span>
+                </div>
+              </div>
+            </div>
+            <div class="result-caption">
+              <strong>Applications</strong>
+              <span>Tools that work</span>
+            </div>
+          </div>
+
+          <div class="result-card result-idea" data-result="idea">
+            <div class="result-header">
+              <span class="result-icon pink">✳</span>
+              <span>EXPERIMENT</span>
+              <span class="result-dots">•••</span>
+            </div>
+            <div class="idea-preview">
+              <div class="idea-circle"></div>
+              <div class="idea-cross">✳</div>
+              <div class="idea-ring"></div>
+            </div>
+            <div class="result-caption">
+              <strong>Experiments</strong>
+              <span>Exploring the unknown</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Text changes with scroll -->
+        <div class="showcase-bottom" id="showcaseBottom">
+          <div class="showcase-step">01 / 04</div>
+          <div class="showcase-message">
+            <span class="eyebrow" id="showcaseEyebrow">A SINGLE SPACE</span>
+            <h3 id="showcaseText">모든 것은 하나의<br>생각에서 시작됩니다.</h3>
+          </div>
+          <div class="showcase-hint">KEEP SCROLLING ↓</div>
+        </div>
+
+        <div class="showcase-progress">
+          <div id="showcaseProgress"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 STEPS -->
+  <section class="journey">
+    <div class="journey-intro">
+      <span class="eyebrow">HOW IDEAS BECOME REAL</span>
+      <h2>From idea<br>to <span class="text-gradient">something more.</span></h2>
+      <p>생각에서 결과물까지. Marst가 이어가는 다섯 가지 과정.</p>
+    </div>
+
+    <div class="journey-list">
+
+      <article class="journey-item">
+        <div class="journey-number">01</div>
+        <div class="journey-content">
+          <span class="journey-label">DISCOVER</span>
+          <h3>발견</h3>
+          <p>일상 속 불편함, 궁금증, 새로운 가능성.<br>모든 프로젝트의 출발점은 발견입니다.</p>
+        </div>
+        <div class="journey-visual visual-discover">
+          <div class="discover-light"></div>
+          <div class="discover-ring ring-one"></div>
+          <div class="discover-ring ring-two"></div>
+          <div class="discover-core">?</div>
+        </div>
+      </article>
+
+      <article class="journey-item">
+        <div class="journey-number">02</div>
+        <div class="journey-content">
+          <span class="journey-label">IMAGINE</span>
+          <h3>상상</h3>
+          <p>어떻게 만들 수 있을까?<br>가능한 방법을 탐구하고 방향을 구체화합니다.</p>
+        </div>
+        <div class="journey-visual visual-imagine">
+          <div class="imagine-shape shape-a"></div>
+          <div class="imagine-shape shape-b"></div>
+          <div class="imagine-shape shape-c"></div>
+          <div class="imagine-center">IDEA</div>
+        </div>
+      </article>
+
+      <article class="journey-item">
+        <div class="journey-number">03</div>
+        <div class="journey-content">
+          <span class="journey-label">CREATE</span>
+          <h3>제작</h3>
+          <p>코드와 디자인, 기술과 창의성.<br>직접 만들고 실험하며 아이디어를 구현합니다.</p>
+        </div>
+        <div class="journey-visual visual-create">
+          <div class="create-window">
+            <div class="create-top"><i></i><i></i><i></i></div>
+            <div class="create-lines">
+              <span></span><span></span><span></span>
+              <span></span><span></span><span></span>
+              <span></span><span></span><span></span>
+            </div>
+            <div class="create-cursor"></div>
+          </div>
+        </div>
+      </article>
+
+      <article class="journey-item">
+        <div class="journey-number">04</div>
+        <div class="journey-content">
+          <span class="journey-label">CONNECT</span>
+          <h3>연결</h3>
+          <p>각각의 기술과 아이디어를 연결하고,<br>더 나은 경험과 새로운 가치를 만듭니다.</p>
+        </div>
+        <div class="journey-visual visual-connect">
+          <div class="connect-node node-center">M</div>
+          <div class="connect-node node-1">WEB</div>
+          <div class="connect-node node-2">AI</div>
+          <div class="connect-node node-3">DEV</div>
+          <div class="connect-node node-4">IDEA</div>
+          <div class="connect-line"></div>
+        </div>
+      </article>
+
+      <article class="journey-item">
+        <div class="journey-number">05</div>
+        <div class="journey-content">
+          <span class="journey-label">REALIZE</span>
+          <h3>실현</h3>
+          <p>아이디어가 실제 결과물이 되는 순간.<br>그리고 다음 가능성을 향한 새로운 시작.</p>
+        </div>
+        <div class="journey-visual visual-realize">
+          <div class="realize-glow"></div>
+          <div class="realize-box">
+            <span>MARST</span>
+            <strong>IDEA<br>→ REALITY</strong>
+            <i>✳</i>
+          </div>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- EXPLORE -->
+  <section class="explore">
+    <div class="explore-heading">
+      <div>
+        <span class="eyebrow">EXPLORE</span>
+        <h2>Explore Marst.</h2>
+      </div>
+      <p>Marst의 다양한 공간을 만나보세요.</p>
+    </div>
+
+    <div class="explore-grid">
+      <a href="history.html" class="explore-card">
+        <span class="explore-index">01</span>
+        <div class="explore-art art-history"><span>↗</span></div>
+        <div class="explore-card-bottom">
+          <div><h3>History</h3><p>Marst의 기록과 이야기</p></div>
+          <span class="explore-arrow">↗</span>
+        </div>
+      </a>
+
+      <a href="links.html" class="explore-card">
+        <span class="explore-index">02</span>
+        <div class="explore-art art-links"><span>⌘</span></div>
+        <div class="explore-card-bottom">
+          <div><h3>Quick Links</h3><p>프로젝트와 웹사이트</p></div>
+          <span class="explore-arrow">↗</span>
+        </div>
+      </a>
+
+      <a href="purchase.html" class="explore-card" data-auth>
+        <span class="explore-index">03</span>
+        <div class="explore-art art-store"><span>◇</span></div>
+        <div class="explore-card-bottom">
+          <div><h3>Purchase</h3><p>제품 및 서비스</p></div>
+          <span class="explore-arrow">↗</span>
+        </div>
+      </a>
+
+      <a href="consult.html" class="explore-card" data-auth>
+        <span class="explore-index">04</span>
+        <div class="explore-art art-contact"><span>✳</span></div>
+        <div class="explore-card-bottom">
+          <div><h3>Consult</h3><p>상담과 문의</p></div>
+          <span class="explore-arrow">↗</span>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <!-- FINAL -->
+  <section class="final">
+    <span class="eyebrow">THE NEXT IDEA STARTS HERE</span>
+    <h2>Make it<br><span class="text-gradient">something more.</span></h2>
+    <a href="history.html" class="primary-button">Discover Marst <span>↗</span></a>
+  </section>
 
   <footer class="footer">
-    <a class="brand footer-brand" href="index.html">
-      <span class="brand-mark">M</span> MARST
-    </a>
+    <a href="index.html" class="logo"><span class="logo-icon">M</span> MARST</a>
     <span>Ideas become Something more.</span>
     <span>© <span id="year"></span> Marst</span>
   </footer>
