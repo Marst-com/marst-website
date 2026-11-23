@@ -1,21 +1,23 @@
 
 function navigateTo(url, name = "페이지") {
+    let target;
+
     try {
-        const target = new URL(url);
+        target = new URL(url);
 
         if (!["http:", "https:"].includes(target.protocol)) {
-            throw new Error("올바르지 않은 주소입니다.");
+            throw new Error("지원하지 않는 URL입니다.");
         }
 
-        showLoader(`${name}(으)로 이동하고 있습니다.`);
-
-        setTimeout(() => {
-            window.location.assign(target.href);
-        }, 600);
-
     } catch (error) {
-        console.error("[Marst Router]", error);
-        alert("이동할 수 없는 주소입니다.");
-        hideLoader();
+        alert("올바르지 않은 링크입니다.");
+        console.error(error);
+        return;
     }
+
+    showLoader(`${name}(으)로 이동하고 있습니다.`);
+
+    setTimeout(() => {
+        window.location.assign(target.href);
+    }, 650);
 }
