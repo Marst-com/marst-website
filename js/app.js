@@ -1,6 +1,4 @@
-
 async function initializeApp() {
-    const container = document.getElementById("links-container");
     const errorContainer = document.getElementById("error-container");
     const app = document.getElementById("app");
 
@@ -8,20 +6,10 @@ async function initializeApp() {
         new Date().getFullYear();
 
     try {
-        const response = await fetch("./data/links.json", {
-            cache: "no-cache"
-        });
-
-        if (!response.ok) {
-            throw new Error(
-                `JSON 파일을 불러오지 못했습니다. (${response.status})`
-            );
-        }
-
-        const data = await response.json();
+        const data = window.MARST_LINKS;
 
         if (!data || !Array.isArray(data.links)) {
-            throw new Error("links 배열이 존재하지 않습니다.");
+            throw new Error("링크 데이터가 올바르지 않습니다.");
         }
 
         const links = data.links.filter(link => {
@@ -33,7 +21,9 @@ async function initializeApp() {
         document.getElementById("link-count").textContent =
             `${links.length} LINKS`;
 
-        lucide.createIcons();
+        if (window.lucide) {
+            lucide.createIcons();
+        }
 
     } catch (error) {
         console.error("[Marst Website]", error);
@@ -44,7 +34,9 @@ async function initializeApp() {
         document.getElementById("error-message").textContent =
             error.message;
 
-        lucide.createIcons();
+        if (window.lucide) {
+            lucide.createIcons();
+        }
     }
 }
 
