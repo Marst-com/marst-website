@@ -2,624 +2,232 @@
 (() => {
   "use strict";
 
-  const canvas = document.getElementById("scene");
-  const ctx = canvas.getContext("2d", { alpha: false });
+  const section = document.querySelector(".showcase-scroll");
+  const sticky = document.querySelector(".showcase-sticky");
+  const workspace = document.getElementById("workspace");
+  const heading = document.getElementById("showcaseHeading");
+  const bottom = document.getElementById("showcaseBottom");
+  const progressBar = document.getElementById("showcaseProgress");
 
-  const cinematic = document.getElementById("cinematic");
-  const progressBar = document.getElementById("progressBar");
-  const sceneCounter = document.getElementById("sceneCounter");
-  const sideSceneName = document.getElementById("sideSceneName");
-  const scenes = [...document.querySelectorAll(".scene-copy")];
+  const cards = {
+    web: document.querySelector('[data-result="web"]'),
+    code: document.querySelector('[data-result="code"]'),
+    video: document.querySelector('[data-result="video"]'),
+    app: document.querySelector('[data-result="app"]'),
+    idea: document.querySelector('[data-result="idea"]')
+  };
 
-  const sceneNames = [
-    "INTRODUCTION",
-    "THE BEGINNING",
-    "THE PROCESS",
-    "THE RESULT",
-    "WHAT'S NEXT"
+  const eyebrow = document.getElementById("showcaseEyebrow");
+  const text = document.getElementById("showcaseText");
+  const step = document.querySelector(".showcase-step");
+
+  const steps = [
+    {
+      eyebrow: "A SINGLE SPACE",
+      title: "모든 것은 하나의<br>생각에서 시작됩니다.",
+      number: "01 / 04"
+    },
+    {
+      eyebrow: "CREATIVE POSSIBILITIES",
+      title: "하나의 공간에서<br>다양한 아이디어가 펼쳐집니다.",
+      number: "02 / 04"
+    },
+    {
+      eyebrow: "FROM IDEA TO CREATION",
+      title: "웹, 코드, 영상.<br>생각은 다양한 모습이 됩니다.",
+      number: "03 / 04"
+    },
+    {
+      eyebrow: "MAKE SOMETHING MORE",
+      title: "하나의 아이디어.<br>수많은 결과물.",
+      number: "04 / 04"
+    }
   ];
 
-  let width = 0;
-  let height = 0;
-  let dpr = 1;
   let progress = 0;
-  let currentScene = -1;
-  let animationFrame = 0;
+  let currentStep = -1;
+  let raf = false;
 
-  const reducedMotion = window.matchMedia(
-    "(prefers-reduced-motion: reduce)"
-  ).matches;
+  const clamp = (v, min = 0, max = 1) => Math.max(min, Math.min(max, v));
+  const ease = (v) => {
+    v = clamp(v);
+    return v * v * (3 - 2 * v);
+  };
+  const mix = (a, b, t) => a + (b - a) * t;
 
-  // -----------------------------
-  // Canvas setup
-  // -----------------------------
-
-  function resize() {
-    width = window.innerWidth;
-    height = window.innerHeight;
-
-    // Old PCs: limit pixel ratio to reduce GPU load.
-    dpr = Math.min(window.devicePixelRatio || 1, 1.3);
-
-    canvas.width = Math.floor(width * dpr);
-    canvas.height = Math.floor(height * dpr);
-
-    canvas.style.width = width + "px";
-    canvas.style.height = height + "px";
-
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    requestRender();
-  }
-
-  // -----------------------------
-  // Scroll progress
-  // -----------------------------
-
-  function updateScroll() {
-    const rect = cinematic.getBoundingClientRect();
-    const total = cinematic.offsetHeight - height;
-
-    const scrolled = -rect.top;
-    progress = total <= 0
+  function getProgress() {
+    const rect = section.getBoundingClientRect();
+    const scrollDistance = section.offsetHeight - window.innerHeight;
+    progress = scrollDistance <= 0
       ? 0
-      : Math.max(0, Math.min(1, scrolled / total));
+      : clamp(-rect.top / scrollDistance);
 
-    progressBar.style.width = (progress * 100) + "%";
+    update();
+  }
 
-    const sceneIndex = Math.min(
-      scenes.length - 1,
-      Math.floor(progress * scenes.length)
+  function setCard(card, x, y, rotation, scale, opacity) {
+    if (!card) return;
+    card.style.transform =
+      `translate(calc(-50% + ${x}px), calc(-50% + ${y}px)) rotate(${rotation}deg) scale(${scale})`;
+    card.style.opacity = opacity;
+  }
+
+  function update() {
+    const p = progress;
+
+    // Intro headline fades away as the workspace takes over.
+    const headFade = 1 - ease(p / 0.22);
+    heading.style.opacity = headFade;
+    heading.style.transform = `translateY(${-30 * ease(p / .22)}px)`;
+
+    // Workspace expansion
+    const expand = ease((p - .06) / .46);
+    const scale = mix(.72, 1.0, expand);
+    const shiftY = mix(50, -8, expand);
+
+    workspace.style.transform =
+      `translate(-50%, calc(-50% + ${shiftY}px)) scale(${scale})`;
+
+    // Workspace moves slightly upward to leave room for caption.
+    workspace.style.borderRadius = `${mix(15, 8, expand)}px`;
+
+    // Result cards start close to the workspace, then spread outward.
+    const spread = ease((p - .25) / .5);
+    const fade = ease((p - .18) / .24);
+
+    const isMobile = window.innerWidth <= 650;
+
+    const distance = isMobile ? 145 : 285;
+    const vertical = isMobile ? 105 : 150;
+
+    // Cards fan outward from the main window.
+    setCard(
+      cards.web,
+      -distance * spread,
+      -vertical * spread,
+      mix(-2, -5, spread),
+      mix(.72, 1, spread),
+      fade
     );
 
-    if (sceneIndex !== currentScene) {
-      currentScene = sceneIndex;
-
-      scenes.forEach((scene, i) => {
-        scene.classList.toggle("active", i === sceneIndex);
-      });
-
-      sceneCounter.textContent =
-        String(sceneIndex + 1).padStart(2, "0") +
-        " / " +
-        String(scenes.length).padStart(2, "0");
-
-      sideSceneName.textContent = sceneNames[sceneIndex];
-    }
-
-    requestRender();
-  }
-
-  // -----------------------------
-  // Helpers
-  // -----------------------------
-
-  function clamp(value, min = 0, max = 1) {
-    return Math.max(min, Math.min(max, value));
-  }
-
-  function lerp(a, b, t) {
-    return a + (b - a) * t;
-  }
-
-  function smooth(t) {
-    t = clamp(t);
-    return t * t * (3 - 2 * t);
-  }
-
-  function segment(start, end) {
-    return smooth((progress - start) / (end - start));
-  }
-
-  function clear() {
-    ctx.fillStyle = "#080910";
-    ctx.fillRect(0, 0, width, height);
-  }
-
-  function glow(x, y, radius, color, alpha = 1) {
-    const gradient = ctx.createRadialGradient(
-      x, y, 0,
-      x, y, radius
+    setCard(
+      cards.code,
+      distance * spread,
+      -vertical * .7 * spread,
+      mix(2, 4, spread),
+      mix(.72, 1, spread),
+      fade
     );
 
-    gradient.addColorStop(0, color);
-    gradient.addColorStop(1, "rgba(0,0,0,0)");
-
-    ctx.save();
-    ctx.globalAlpha = alpha;
-    ctx.fillStyle = gradient;
-    ctx.fillRect(x - radius, y - radius, radius * 2, radius * 2);
-    ctx.restore();
-  }
-
-  function line(x1, y1, x2, y2, color, alpha = 1, lineWidth = 1) {
-    ctx.save();
-    ctx.globalAlpha = alpha;
-    ctx.strokeStyle = color;
-    ctx.lineWidth = lineWidth;
-    ctx.beginPath();
-    ctx.moveTo(x1, y1);
-    ctx.lineTo(x2, y2);
-    ctx.stroke();
-    ctx.restore();
-  }
-
-  // -----------------------------
-  // Stars / particles
-  // -----------------------------
-
-  const stars = Array.from({ length: 110 }, () => ({
-    x: Math.random(),
-    y: Math.random(),
-    radius: Math.random() * 1.4 + .2,
-    alpha: Math.random() * .55 + .1,
-    speed: Math.random() * .4 + .1
-  }));
-
-  function drawStars(time) {
-    for (const star of stars) {
-      const twinkle = reducedMotion
-        ? 0
-        : Math.sin(time * star.speed + star.x * 30) * .15;
-
-      ctx.beginPath();
-      ctx.arc(
-        star.x * width,
-        star.y * height,
-        star.radius,
-        0,
-        Math.PI * 2
-      );
-
-      ctx.fillStyle = `rgba(225,230,255,${clamp(star.alpha + twinkle)})`;
-      ctx.fill();
-    }
-  }
-
-  // -----------------------------
-  // Orb
-  // -----------------------------
-
-  function drawOrb(x, y, radius, rotation, scale = 1) {
-    ctx.save();
-    ctx.translate(x, y);
-    ctx.rotate(rotation);
-
-    const r = radius * scale;
-
-    // Main sphere
-    const sphere = ctx.createRadialGradient(
-      -r * .32, -r * .38, r * .05,
-      0, 0, r
+    setCard(
+      cards.video,
+      -distance * .85 * spread,
+      vertical * spread,
+      mix(2, 3, spread),
+      mix(.72, 1, spread),
+      fade
     );
 
-    sphere.addColorStop(0, "#b9a4ff");
-    sphere.addColorStop(.2, "#7960d5");
-    sphere.addColorStop(.55, "#352b68");
-    sphere.addColorStop(.82, "#17152f");
-    sphere.addColorStop(1, "#070810");
-
-    ctx.beginPath();
-    ctx.arc(0, 0, r, 0, Math.PI * 2);
-    ctx.fillStyle = sphere;
-    ctx.fill();
-
-    // Sphere glow
-    ctx.save();
-    ctx.globalCompositeOperation = "screen";
-
-    const halo = ctx.createRadialGradient(
-      0, 0, r * .7,
-      0, 0, r * 1.8
+    setCard(
+      cards.app,
+      distance * .85 * spread,
+      vertical * .9 * spread,
+      mix(-2, -3, spread),
+      mix(.72, 1, spread),
+      fade
     );
 
-    halo.addColorStop(0, "rgba(130,105,255,.12)");
-    halo.addColorStop(1, "rgba(90,80,255,0)");
-
-    ctx.beginPath();
-    ctx.arc(0, 0, r * 1.8, 0, Math.PI * 2);
-    ctx.fillStyle = halo;
-    ctx.fill();
-    ctx.restore();
-
-    // Orb highlight
-    ctx.beginPath();
-    ctx.arc(-r * .32, -r * .38, r * .12, 0, Math.PI * 2);
-    ctx.fillStyle = "rgba(255,255,255,.22)";
-    ctx.fill();
-
-    ctx.restore();
-  }
-
-  // -----------------------------
-  // Orbit rings
-  // -----------------------------
-
-  function drawOrbit(x, y, radius, rotation, color, lineWidth = 1, alpha = .4) {
-    ctx.save();
-    ctx.translate(x, y);
-    ctx.rotate(rotation);
-
-    ctx.beginPath();
-    ctx.ellipse(
-      0, 0,
-      radius,
-      radius * .34,
+    setCard(
+      cards.idea,
       0,
-      0,
-      Math.PI * 2
+      vertical * 1.65 * spread,
+      mix(0, 2, spread),
+      mix(.65, .92, spread),
+      fade * ease((p - .4) / .2)
     );
 
-    ctx.strokeStyle = color;
-    ctx.globalAlpha = alpha;
-    ctx.lineWidth = lineWidth;
-    ctx.stroke();
+    // End: main window becomes smaller, cards form a balanced composition.
+    const end = ease((p - .74) / .2);
 
-    ctx.restore();
-  }
+    const finalScale = mix(1, .78, end);
+    workspace.style.transform =
+      `translate(-50%, calc(-50% + ${mix(-8, -35, end)}px)) scale(${finalScale})`;
 
-  // -----------------------------
-  // Floating light points
-  // -----------------------------
+    // Caption visibility
+    bottom.style.opacity = ease((p - .22) / .15);
+    bottom.style.transform = `translateY(${mix(20, 0, ease((p - .22) / .15))}px)`;
 
-  function drawFloatingPoints(time, x, y, radius) {
-    for (let i = 0; i < 12; i++) {
-      const angle = time * .00015 + i * (Math.PI * 2 / 12);
-      const orbit = radius * (1.3 + (i % 3) * .25);
+    // Progress
+    progressBar.style.width = `${p * 100}%`;
 
-      const px = x + Math.cos(angle) * orbit;
-      const py = y + Math.sin(angle) * orbit * .55;
+    // Caption steps
+    let index = 0;
+    if (p >= .28) index = 1;
+    if (p >= .50) index = 2;
+    if (p >= .76) index = 3;
 
-      ctx.beginPath();
-      ctx.arc(px, py, (i % 3) + 1, 0, Math.PI * 2);
-      ctx.fillStyle = i % 2 === 0
-        ? "rgba(130,115,255,.7)"
-        : "rgba(100,210,255,.7)";
-      ctx.fill();
-    }
-  }
-
-  // -----------------------------
-  // Background grid
-  // -----------------------------
-
-  function drawGrid(alpha) {
-    if (alpha <= 0) return;
-
-    const spacing = 70;
-    const offset = (progress * 120) % spacing;
-
-    ctx.save();
-    ctx.globalAlpha = alpha * .14;
-    ctx.strokeStyle = "#9288ff";
-    ctx.lineWidth = .5;
-
-    for (let x = -spacing; x < width + spacing; x += spacing) {
-      ctx.beginPath();
-      ctx.moveTo(x + offset, 0);
-      ctx.lineTo(x + offset, height);
-      ctx.stroke();
+    if (index !== currentStep) {
+      currentStep = index;
+      eyebrow.textContent = steps[index].eyebrow;
+      text.innerHTML = steps[index].title;
+      step.textContent = steps[index].number;
     }
 
-    for (let y = -spacing; y < height + spacing; y += spacing) {
-      ctx.beginPath();
-      ctx.moveTo(0, y + offset);
-      ctx.lineTo(width, y + offset);
-      ctx.stroke();
-    }
-
-    ctx.restore();
-  }
-
-  // -----------------------------
-  // Main cinematic renderer
-  // -----------------------------
-
-  function render(time = 0) {
-    clear();
-
-    const centerX = width * .70;
-    const centerY = height * .50;
-
-    const intro = 1 - segment(0.08, 0.20);
-    const beginning = segment(0.12, 0.34);
-    const process = segment(0.34, 0.58);
-    const result = segment(0.58, 0.80);
-    const ending = segment(0.80, 0.98);
-
-    // Dynamic background colors
-    const colorShift = progress;
-
-    glow(
-      width * lerp(.75, .35, colorShift),
-      height * .5,
-      Math.max(width, height) * .7,
-      "rgba(83,57,181,.18)",
-      1
-    );
-
-    glow(
-      width * lerp(.2, .8, colorShift),
-      height * .7,
-      Math.max(width, height) * .55,
-      "rgba(37,126,185,.12)",
-      1
-    );
-
-    drawStars(time);
-
-    // Grid gradually appears and disappears
-    drawGrid(process * (1 - ending));
-
-    // Initial hero orb
-    const orbProgress = smooth(progress);
-    const orbScale = lerp(1.0, .55, orbProgress);
-
-    const orbX = width * lerp(.74, .76, orbProgress);
-    const orbY = height * .50 + Math.sin(time * .0004) * 12;
-    const orbRadius = Math.min(width, height) * .19 * orbScale;
-
-    // Scene 1: glowing orb
-    const orbAlpha = clamp(1 - segment(.12, .32) + .25);
-
-    glow(
-      orbX,
-      orbY,
-      orbRadius * 3.2,
-      "rgba(124,86,255,.30)",
-      orbAlpha
-    );
-
-    drawOrbit(
-      orbX,
-      orbY,
-      orbRadius * 1.7,
-      time * .0002,
-      "#9d8cff",
-      1,
-      .4 * orbAlpha
-    );
-
-    drawOrbit(
-      orbX,
-      orbY,
-      orbRadius * 2.0,
-      -time * .00015,
-      "#65d8ff",
-      1,
-      .22 * orbAlpha
-    );
-
-    drawFloatingPoints(time, orbX, orbY, orbRadius);
-    drawOrb(orbX, orbY, orbRadius, time * .0001, 1);
-
-    // Scene 2: orb grows and gets brighter
-    const growth = beginning * (1 - process);
-
-    if (growth > 0) {
-      const bigRadius = orbRadius * lerp(1, 1.6, growth);
-
-      glow(
-        orbX,
-        orbY,
-        bigRadius * 3,
-        "rgba(111,90,255,.25)",
-        growth
-      );
-
-      drawOrbit(
-        orbX,
-        orbY,
-        bigRadius * 2,
-        time * .00035,
-        "#a38dff",
-        1.5,
-        .6 * growth
-      );
-    }
-
-    // Scene 3: abstract network emerges
-    if (process > 0) {
-      drawNetwork(time, process);
-    }
-
-    // Scene 4: particle convergence / creation
-    if (result > 0) {
-      drawConvergence(time, result);
-    }
-
-    // Scene 5: final burst
-    if (ending > 0) {
-      drawFinal(time, ending);
+    // Final cards settle into place
+    if (end > 0) {
+      const finalDistance = isMobile ? 115 : 210;
+      setCard(cards.web, -finalDistance, -95, -4, .86, fade);
+      setCard(cards.code, finalDistance, -95, 4, .86, fade);
+      setCard(cards.video, -finalDistance, 90, 3, .86, fade);
+      setCard(cards.app, finalDistance, 90, -3, .86, fade);
+      setCard(cards.idea, 0, 165, 0, .8, fade);
     }
   }
 
-  // -----------------------------
-  // Network animation
-  // -----------------------------
+  function requestUpdate() {
+    if (raf) return;
+    raf = true;
 
-  function drawNetwork(time, amount) {
-    const nodes = [];
-    const count = 26;
-
-    for (let i = 0; i < count; i++) {
-      const angle = (i / count) * Math.PI * 2;
-      const radius = Math.min(width, height) * (.20 + (i % 4) * .055);
-
-      const drift = reducedMotion ? 0 : Math.sin(time * .0005 + i) * 12;
-
-      nodes.push({
-        x: width * .65 + Math.cos(angle) * (radius + drift),
-        y: height * .5 + Math.sin(angle) * (radius + drift),
-        size: (i % 3) + 2
-      });
-    }
-
-    ctx.save();
-    ctx.globalAlpha = amount * .65;
-
-    // Connections
-    for (let i = 0; i < nodes.length; i++) {
-      for (let j = i + 1; j < nodes.length; j++) {
-        const dx = nodes[i].x - nodes[j].x;
-        const dy = nodes[i].y - nodes[j].y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-
-        if (dist < Math.min(width, height) * .22) {
-          line(
-            nodes[i].x, nodes[i].y,
-            nodes[j].x, nodes[j].y,
-            "#8d7cff",
-            (1 - dist / (Math.min(width, height) * .22)) * .3 * amount,
-            .7
-          );
-        }
-      }
-    }
-
-    // Nodes
-    for (const node of nodes) {
-      glow(node.x, node.y, 18, "rgba(118,128,255,.5)", amount * .5);
-
-      ctx.beginPath();
-      ctx.arc(node.x, node.y, node.size, 0, Math.PI * 2);
-      ctx.fillStyle = "#b9aaff";
-      ctx.fill();
-    }
-
-    ctx.restore();
-  }
-
-  // -----------------------------
-  // Result convergence
-  // -----------------------------
-
-  function drawConvergence(time, amount) {
-    const cx = width * .68;
-    const cy = height * .5;
-    const radius = Math.min(width, height) * .32;
-
-    ctx.save();
-    ctx.globalAlpha = amount;
-
-    for (let i = 0; i < 65; i++) {
-      const angle = i * 2.399963; // golden angle
-      const distance = radius * (1 - amount) * (i / 65);
-
-      const x = cx + Math.cos(angle + time * .00015) * distance;
-      const y = cy + Math.sin(angle + time * .00015) * distance;
-
-      ctx.beginPath();
-      ctx.arc(x, y, 1 + (i % 3), 0, Math.PI * 2);
-      ctx.fillStyle = i % 2 === 0 ? "#9b87ff" : "#70d9ff";
-      ctx.fill();
-    }
-
-    glow(
-      cx, cy,
-      radius * (1 + amount),
-      "rgba(115,100,255,.2)",
-      amount
-    );
-
-    ctx.restore();
-  }
-
-  // -----------------------------
-  // Final scene
-  // -----------------------------
-
-  function drawFinal(time, amount) {
-    const cx = width * .72;
-    const cy = height * .5;
-    const radius = Math.min(width, height) * .15;
-
-    glow(
-      cx, cy,
-      radius * 4,
-      "rgba(105,130,255,.22)",
-      amount
-    );
-
-    drawOrbit(
-      cx, cy,
-      radius * 2.2,
-      time * .0001,
-      "#8d87ff",
-      1.2,
-      amount * .5
-    );
-
-    drawOrbit(
-      cx, cy,
-      radius * 2.8,
-      -time * .00008,
-      "#65d9ff",
-      1,
-      amount * .35
-    );
-
-    drawOrb(cx, cy, radius, 0, amount);
-  }
-
-  // -----------------------------
-  // Render scheduling
-  // -----------------------------
-
-  function requestRender() {
-    if (animationFrame) return;
-
-    animationFrame = requestAnimationFrame((time) => {
-      animationFrame = 0;
-      render(time);
+    requestAnimationFrame(() => {
+      raf = false;
+      getProgress();
     });
   }
 
-  // -----------------------------
-  // Events
-  // -----------------------------
+  window.addEventListener("scroll", requestUpdate, { passive: true });
+  window.addEventListener("resize", requestUpdate, { passive: true });
 
-  window.addEventListener("resize", resize, { passive: true });
-  window.addEventListener("scroll", updateScroll, { passive: true });
+  // Mobile navigation
+  const menuButton = document.getElementById("menuButton");
+  const nav = document.getElementById("nav");
 
-  resize();
-  updateScroll();
-
-  // Mobile menu
-  const menuToggle = document.getElementById("menuToggle");
-  const navLinks = document.querySelector(".nav-links");
-
-  if (menuToggle && navLinks) {
-    menuToggle.addEventListener("click", () => {
-      navLinks.classList.toggle("open");
+  if (menuButton && nav) {
+    menuButton.addEventListener("click", () => {
+      nav.classList.toggle("open");
     });
 
-    navLinks.querySelectorAll("a").forEach((link) => {
-      link.addEventListener("click", () => {
-        navLinks.classList.remove("open");
-      });
+    nav.querySelectorAll("a").forEach(a => {
+      a.addEventListener("click", () => nav.classList.remove("open"));
     });
   }
 
-  // Footer year
-  const yearElement = document.getElementById("year");
-  if (yearElement) {
-    yearElement.textContent = new Date().getFullYear();
-  }
+  // Login placeholder: frontend-only, not real authentication
+  document.querySelectorAll("[data-auth]").forEach(link => {
+    link.addEventListener("click", event => {
+      const loggedIn = sessionStorage.getItem("marst_logged_in") === "true";
 
-  // Frontend-only login guard.
-  // This is only a UI demonstration, not real authentication.
-  document.querySelectorAll("[data-protected]").forEach((link) => {
-    link.addEventListener("click", (event) => {
-      const isLoggedIn = sessionStorage.getItem("marst_logged_in") === "true";
-
-      if (!isLoggedIn) {
+      if (!loggedIn) {
         event.preventDefault();
-
-        const target = link.getAttribute("href");
+        const destination = link.getAttribute("href");
         window.location.href =
-          "login.html?return=" + encodeURIComponent(target);
+          "login.html?return=" + encodeURIComponent(destination);
       }
     });
   });
 
+  // Footer year
+  const year = document.getElementById("year");
+  if (year) year.textContent = new Date().getFullYear();
+
+  getProgress();
 })();
