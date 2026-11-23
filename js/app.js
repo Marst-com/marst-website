@@ -1,3 +1,4 @@
+
 async function initializeApp() {
     const errorContainer = document.getElementById("error-container");
     const app = document.getElementById("app");
