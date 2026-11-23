@@ -6,84 +6,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#ffffff">
 
-    <title>Marst — Official</title>
-    <meta name="description" content="Marst의 공식 웹사이트입니다.">
+    <title>Marst — Official Website</title>
+    <meta name="description" content="Marst의 공식 웹사이트. 다양한 활동과 프로젝트를 만나보세요.">
 
     <link rel="stylesheet" href="css/style.css">
-
-    <script src="https://unpkg.com/lucide@latest"></script>
-</head>
-<body>
-
-    <div id="app">
-        <header class="header">
-            <a href="/" class="logo">
-                <span class="logo-mark">M</span>
-                <span>Marst</span>
-            </a>
-
-            <span class="header-label">OFFICIAL WEBSITE</span>
-        </header>
-
-        <main class="main">
-
-            <section class="hero">
-                <div class="hero-label">
-                    <span class="status-dot"></span>
-                    MARST OFFICIAL
-                </div>
-
-                <h1>
-                    안녕하세요,<br>
-                    <span class="gradient-text">Marst입니다.</span>
-                </h1>
-
-                <p class="hero-description">
-                    Marst의 다양한 활동과 프로젝트를 만나보세요.
-                </p>
-            </section>
-
-            <section class="links-section">
-                <div class="section-heading">
-                    <div>
-                        <h2>바로가기</h2>
-                        <p>Marst의 웹사이트와 프로젝트</p>
-                    </div>
-
-                    <span id="link-count" class="link-count">0 LINKS</span>
-                </div>
-
-                <div id="links-container">
-                    <div class="loading-placeholder">
-                        링크를 불러오는 중...
-                    </div>
-                </div>
-            </section>
-
-        </main>
-
-        <footer class="footer">
-            <div class="footer-logo">Marst</div>
-            <p>© <span id="year"></span> Marst. All rights reserved.</p>
-        </footer>
-    </div>
-
-    <div id="navigation-loader" class="navigation-loader">
-        <div class="loader-content">
-            <div class="loader-spinner"></div>
-            <h2>이동 중입니다</h2>
-            <p id="loader-message">잠시만 기다려 주세요.</p>
-        </div>
-    </div>
-
-    <div id="error-container" class="error-container hidden">
-        <div class="error-icon">
-            <i data-lucide="alert-circle"></i>
-        </div>
-        <h2>페이지를 불러오지 못했습니다.</h2>
-        <p id="error-message">잠시 후 다시 시도해 주세요.</p>
-        <button onclick="location.reload()">다시 시도</button>
-    </div>
 
     <script src="https://unpkg.com/lucide@latest"></script>
 
@@ -92,6 +18,480 @@
     <script src="js/router.js"></script>
     <script src="js/renderer.js"></script>
     <script src="js/app.js"></script>
+</head>
+
+<body>
+
+<div class="background-effects">
+    <div class="orb orb-one"></div>
+    <div class="orb orb-two"></div>
+    <div class="orb orb-three"></div>
+</div>
+
+<header class="header" id="header">
+
+    <a href="#" class="logo">
+        <span class="logo-symbol">M</span>
+        <span class="logo-name">Marst</span>
+    </a>
+
+    <nav class="navigation">
+        <a href="#home">홈</a>
+        <a href="#about">소개</a>
+        <a href="#links">바로가기</a>
+        <a href="#activity">활동</a>
+    </nav>
+
+    <div class="header-actions">
+        <button class="icon-button" id="theme-toggle" aria-label="테마 변경">
+            <i data-lucide="moon"></i>
+        </button>
+
+        <a href="#links" class="header-button">
+            바로가기 <i data-lucide="arrow-up-right"></i>
+        </a>
+    </div>
+
+    <button class="mobile-menu-button" id="mobile-menu-button" aria-label="메뉴">
+        <i data-lucide="menu"></i>
+    </button>
+
+</header>
+
+<main>
+
+    <!-- HERO -->
+
+    <section class="hero section-container" id="home">
+
+        <div class="hero-content">
+
+            <div class="hero-badge">
+                <span class="live-dot"></span>
+                MARST OFFICIAL WEBSITE
+                <span class="badge-version">2026</span>
+            </div>
+
+            <h1>
+                Ideas become<br>
+                <span class="gradient-text">Something more.</span>
+            </h1>
+
+            <p class="hero-description">
+                안녕하세요, Marst입니다.<br>
+                아이디어를 생각하고, 새로운 것을 만들며,<br>
+                다양한 프로젝트와 활동을 이어갑니다.
+            </p>
+
+            <div class="hero-buttons">
+                <a href="#links" class="primary-button">
+                    둘러보기
+                    <i data-lucide="arrow-right"></i>
+                </a>
+
+                <a href="#about" class="secondary-button">
+                    Marst 알아보기
+                    <i data-lucide="arrow-down"></i>
+                </a>
+            </div>
+
+            <div class="hero-meta">
+                <div class="hero-meta-item">
+                    <span class="meta-dot"></span>
+                    <span>Official Website</span>
+                </div>
+
+                <span class="meta-divider"></span>
+
+                <span id="current-date">Loading...</span>
+            </div>
+
+        </div>
+
+        <div class="hero-visual">
+
+            <div class="visual-glow"></div>
+
+            <div class="visual-card main-visual-card">
+
+                <div class="visual-card-top">
+                    <span class="visual-label">MARST</span>
+                    <span class="visual-indicator"></span>
+                </div>
+
+                <div class="visual-letter">M</div>
+
+                <div class="visual-card-bottom">
+                    <div>
+                        <strong>Marst</strong>
+                        <span>Personal Universe</span>
+                    </div>
+
+                    <i data-lucide="sparkles"></i>
+                </div>
+
+            </div>
+
+            <div class="floating-card floating-card-one">
+                <div class="floating-icon purple">
+                    <i data-lucide="code-2"></i>
+                </div>
+                <div>
+                    <strong>Development</strong>
+                    <span>Creating ideas</span>
+                </div>
+            </div>
+
+            <div class="floating-card floating-card-two">
+                <div class="floating-icon green">
+                    <i data-lucide="lightbulb"></i>
+                </div>
+                <div>
+                    <strong>Creativity</strong>
+                    <span>New possibilities</span>
+                </div>
+            </div>
+
+            <div class="visual-decoration decoration-one"></div>
+            <div class="visual-decoration decoration-two"></div>
+
+        </div>
+
+    </section>
+
+    <!-- QUICK STATS -->
+
+    <section class="stats-section section-container">
+
+        <div class="stats-grid">
+
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i data-lucide="globe"></i>
+                </div>
+                <div>
+                    <strong id="stat-links">0</strong>
+                    <span>등록된 링크</span>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i data-lucide="folder"></i>
+                </div>
+                <div>
+                    <strong id="stat-groups">0</strong>
+                    <span>카테고리</span>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i data-lucide="clock"></i>
+                </div>
+                <div>
+                    <strong id="clock">00:00:00</strong>
+                    <span>현재 시각</span>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i data-lucide="activity"></i>
+                </div>
+                <div>
+                    <strong>ONLINE</strong>
+                    <span>사이트 상태</span>
+                </div>
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- ABOUT -->
+
+    <section class="about-section section-container" id="about">
+
+        <div class="section-eyebrow">
+            <span></span>
+            ABOUT MARST
+        </div>
+
+        <div class="about-layout">
+
+            <div class="about-title">
+                <h2>
+                    생각에서 시작해<br>
+                    <span class="gradient-text">결과로 이어지는</span>
+                    과정.
+                </h2>
+            </div>
+
+            <div class="about-content">
+                <p>
+                    Marst는 새로운 아이디어와 가능성을 탐구합니다.
+                    작은 생각에서 시작해 직접 만들어 보고,
+                    문제를 해결하고, 더 나은 결과를 만들어 가는 것을 중요하게 생각합니다.
+                </p>
+
+                <p>
+                    이 웹사이트는 Marst의 여러 활동과 프로젝트를 연결하는
+                    공식적인 공간입니다. 필요한 사이트와 자료를 한곳에서
+                    편리하게 찾아볼 수 있습니다.
+                </p>
+
+                <a href="#links" class="text-link">
+                    Marst의 공간 둘러보기
+                    <i data-lucide="arrow-up-right"></i>
+                </a>
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- LINKS -->
+
+    <section class="links-section section-container" id="links">
+
+        <div class="section-eyebrow">
+            <span></span>
+            EXPLORE
+        </div>
+
+        <div class="section-header">
+
+            <div>
+                <h2>Marst's Universe</h2>
+                <p>Marst와 연결된 다양한 웹사이트와 프로젝트를 만나보세요.</p>
+            </div>
+
+            <div class="link-search">
+                <i data-lucide="search"></i>
+                <input
+                    type="text"
+                    id="link-search"
+                    placeholder="링크 검색..."
+                    autocomplete="off"
+                >
+                <kbd>/</kbd>
+            </div>
+
+        </div>
+
+        <div class="category-filter" id="category-filter">
+            <button class="filter-button active" data-filter="all">
+                전체
+            </button>
+        </div>
+
+        <div id="links-container" class="links-container">
+
+            <div class="loading-placeholder">
+                <div class="loader-spinner"></div>
+                링크를 불러오는 중입니다...
+            </div>
+
+        </div>
+
+        <div id="no-results" class="no-results hidden">
+            <i data-lucide="search-x"></i>
+            <h3>검색 결과가 없습니다.</h3>
+            <p>다른 검색어를 입력해 보세요.</p>
+        </div>
+
+    </section>
+
+    <!-- ACTIVITY -->
+
+    <section class="activity-section section-container" id="activity">
+
+        <div class="section-eyebrow">
+            <span></span>
+            ACTIVITIES
+        </div>
+
+        <div class="activity-heading">
+            <h2>What I Do.</h2>
+            <p>
+                다양한 분야에 관심을 가지고 새로운 가능성을 탐구합니다.
+            </p>
+        </div>
+
+        <div class="activity-grid">
+
+            <article class="activity-card activity-purple">
+                <div class="activity-card-icon">
+                    <i data-lucide="code-2"></i>
+                </div>
+
+                <span class="activity-number">01 / DEVELOPMENT</span>
+
+                <h3>Development</h3>
+
+                <p>
+                    새로운 프로그램과 서비스를 기획하고 개발합니다.
+                    코드로 아이디어를 실제 결과물로 만들어 갑니다.
+                </p>
+
+                <div class="activity-decoration">
+                    <i data-lucide="braces"></i>
+                </div>
+            </article>
+
+            <article class="activity-card activity-blue">
+                <div class="activity-card-icon">
+                    <i data-lucide="brain"></i>
+                </div>
+
+                <span class="activity-number">02 / TECHNOLOGY</span>
+
+                <h3>Technology</h3>
+
+                <p>
+                    인공지능과 다양한 기술을 탐구하며
+                    새로운 활용 방법을 찾아봅니다.
+                </p>
+
+                <div class="activity-decoration">
+                    <i data-lucide="cpu"></i>
+                </div>
+            </article>
+
+            <article class="activity-card activity-green">
+                <div class="activity-card-icon">
+                    <i data-lucide="palette"></i>
+                </div>
+
+                <span class="activity-number">03 / CREATION</span>
+
+                <h3>Creation</h3>
+
+                <p>
+                    콘텐츠와 디자인 등 다양한 창작 활동을 통해
+                    나만의 결과물을 만들어 갑니다.
+                </p>
+
+                <div class="activity-decoration">
+                    <i data-lucide="shapes"></i>
+                </div>
+            </article>
+
+            <article class="activity-card activity-orange">
+                <div class="activity-card-icon">
+                    <i data-lucide="rocket"></i>
+                </div>
+
+                <span class="activity-number">04 / PROJECTS</span>
+
+                <h3>Projects</h3>
+
+                <p>
+                    여러 프로젝트를 기획하고 실행하며
+                    새로운 도전을 이어갑니다.
+                </p>
+
+                <div class="activity-decoration">
+                    <i data-lucide="layers"></i>
+                </div>
+            </article>
+
+        </div>
+
+    </section>
+
+    <!-- BOTTOM BANNER -->
+
+    <section class="bottom-banner section-container">
+
+        <div class="banner-content">
+            <span>WELCOME TO MARST</span>
+
+            <h2>
+                Explore the<br>
+                possibilities.
+            </h2>
+
+            <p>
+                Marst의 다양한 공간을 지금 만나보세요.
+            </p>
+
+            <a href="#links" class="banner-button">
+                시작하기
+                <i data-lucide="arrow-right"></i>
+            </a>
+        </div>
+
+        <div class="banner-decoration">
+            M
+        </div>
+
+    </section>
+
+</main>
+
+<!-- FOOTER -->
+
+<footer class="footer">
+
+    <div class="footer-main section-container">
+
+        <div class="footer-brand">
+            <a href="#" class="logo">
+                <span class="logo-symbol">M</span>
+                <span class="logo-name">Marst</span>
+            </a>
+
+            <p>
+                Ideas become something more.<br>
+                Welcome to Marst's universe.
+            </p>
+        </div>
+
+        <div class="footer-column">
+            <h4>EXPLORE</h4>
+            <a href="#home">홈</a>
+            <a href="#about">소개</a>
+            <a href="#links">바로가기</a>
+            <a href="#activity">활동</a>
+        </div>
+
+        <div class="footer-column">
+            <h4>INFORMATION</h4>
+            <span>Marst Official Website</span>
+            <span>Personal Website</span>
+            <span>© <span id="year"></span> Marst</span>
+        </div>
+
+    </div>
+
+    <div class="footer-bottom section-container">
+        <span>© <span id="footer-year"></span> Marst. All rights reserved.</span>
+        <span>Made with ideas and creativity.</span>
+    </div>
+
+</footer>
+
+<!-- LOADER -->
+
+<div id="navigation-loader" class="navigation-loader">
+    <div class="loader-content">
+        <div class="loader-logo">M</div>
+        <div class="loader-spinner"></div>
+        <h2>이동 중입니다</h2>
+        <p id="loader-message">잠시만 기다려 주세요.</p>
+    </div>
+</div>
+
+<!-- ERROR -->
+
+<div id="error-container" class="error-container hidden">
+    <i data-lucide="alert-circle"></i>
+    <h2>페이지를 불러오지 못했습니다.</h2>
+    <p id="error-message"></p>
+    <button onclick="location.reload()">다시 시도</button>
+</div>
 
 </body>
 </html>
