@@ -4,11 +4,12 @@ export const SITE = {
     description: "Ideas into reality.",
     year: new Date().getFullYear(),
 
+
     navigation: [
-        { label: "Home", href: "index.html" },
-        { label: "History", href: "history.html" },
-        { label: "Quick Links", href: "quick-links.html" },
-        { label: "Purchase", href: "purchase.html", auth: true },
-        { label: "Consult", href: "consult.html", auth: true }
+        { label: "Home", key: "nav.home", href: "index.html" },
+        { label: "History", key: "nav.history", href: "history.html" },
+        { label: "Quick Links", key: "nav.links", href: "quick-links.html" },
+        { label: "Purchase", key: "nav.purchase", href: "purchase.html", auth: true },
+        { label: "Consult", key: "nav.consult", href: "consult.html", auth: true }
     ]
 };
