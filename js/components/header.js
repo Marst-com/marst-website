@@ -16,28 +16,33 @@ export function renderHeader() {
 
                 <nav class="nav" id="main-nav">
                     ${SITE.navigation.map(item => `
-                        <a
-                            class="nav-link"
-                            href="./${item.href}"
-                            ${item.auth ? 'data-auth="true"' : ""}
-                        >
-                            ${item.label}
+                        <a class="nav-link"
+                           href="./${item.href}"
+                           ${item.auth ? 'data-auth="true"' : ""}
+                           data-i18n="${item.key}">
+                           ${item.label}
                         </a>
                     `).join("")}
                 </nav>
 
                 <div class="header-right">
+
+                    <button class="header-control" id="language-toggle"
+                        aria-label="Change language">EN</button>
+
+                    <button class="header-control theme-control" id="theme-toggle"
+                        aria-label="Change theme">☀</button>
+
                     <a class="header-login" href="./login.html">
-                        <span>Sign in</span>
+                        <span data-i18n="nav.login">Sign in</span>
                         <span class="login-arrow">↗</span>
                     </a>
 
                     <button class="menu-button" id="menu-button" aria-label="Open menu">
-                        <span></span>
-                        <span></span>
+                        <span></span><span></span>
                     </button>
-                </div>
 
+                </div>
             </div>
         </header>
     `;
