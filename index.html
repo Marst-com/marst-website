@@ -1,25 +1,86 @@
 
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en" data-theme="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#08090b">
-    <meta name="description" content="Marst — Ideas into reality.">
-    <title>Marst — Ideas into reality.</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link rel="stylesheet" href="./css/main.css">
+  <!-- Basic -->
+  <title>MARST — Ideas into Reality</title>
+  <meta
+    name="description"
+    content="MARST. Ideas into reality. An independent creator exploring technology, digital experiences, ideas and creation."
+  >
+  <meta name="author" content="MARST">
+  <meta name="theme-color" content="#090a0a">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="MARST — Ideas into Reality">
+  <meta property="og:description" content="Ideas into reality. Technology, ideas and creation.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://marst.us.mw">
+  <meta property="og:site_name" content="MARST">
+
+  <!-- Prevent theme flash -->
+  <script>
+    (() => {
+      try {
+        const theme = localStorage.getItem("marst_theme");
+        const language = localStorage.getItem("marst_language");
+
+        document.documentElement.dataset.theme =
+          theme === "light" ? "light" : "dark";
+
+        document.documentElement.lang =
+          language === "ko" ? "ko" : "en";
+      } catch {
+        document.documentElement.dataset.theme = "dark";
+        document.documentElement.lang = "en";
+      }
+    })();
+  </script>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="./css/main.css">
+
+  <!-- Icons -->
+  <link
+    rel="icon"
+    href="./assets/favicon.svg"
+    type="image/svg+xml"
+  >
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
 </head>
+
 <body>
 
-    <div class="site-header" id="header"></div>
+  <!-- App Header -->
+  <header id="header"></header>
 
-    <main id="app">
-        <div id="home-page"></div>
-    </main>
+  <!-- Main App -->
+  <main id="app">
 
-    <div id="footer"></div>
+    <!-- Home Page -->
+    <div id="home-page"></div>
 
-    <script type="module" src="./js/main.js"></script>
+  </main>
+
+  <!-- App Footer -->
+  <footer id="footer"></footer>
+
+  <!-- Loading Screen -->
+  <div id="app-loader" class="app-loader">
+    <div class="loader-brand">MARST<span>.</span></div>
+    <div class="loader-line">
+      <div class="loader-line-progress"></div>
+    </div>
+  </div>
+
+  <!-- Main Module -->
+  <script type="module" src="./js/main.js"></script>
+
 </body>
 </html>
