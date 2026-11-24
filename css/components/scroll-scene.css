@@ -2,6 +2,37 @@
    MARST CONTINUOUS SCROLL ART
 ========================================= */
 
+#story {
+  position: relative !important;
+  height: 900vh !important;
+  overflow: visible !important;
+}
+
+#story .story-sticky {
+  position: sticky !important;
+  position: -webkit-sticky !important;
+  top: 0 !important;
+
+  width: 100% !important;
+  height: 100vh !important;
+  height: 100svh !important;
+
+  min-height: 0 !important;
+  max-height: none !important;
+
+  overflow: hidden !important;
+  z-index: 10;
+}
+
+#story-canvas {
+  position: absolute !important;
+  inset: 0 !important;
+}
+
+#home-page {
+  overflow: visible !important;
+}
+
 .scroll-story {
   position: relative;
   height: 900vh;
