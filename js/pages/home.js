@@ -4,417 +4,475 @@ export function renderHome() {
   if (!root) return;
 
   root.innerHTML = `
-    <!-- HERO -->
-    <section class="hero-section" id="hero">
-      <div class="hero-background">
-        <div class="hero-grid"></div>
-        <div class="hero-glow hero-glow-main"></div>
-        <div class="hero-glow hero-glow-secondary"></div>
+    <!-- =========================================
+         HERO
+    ========================================== -->
+    <section class="marst-hero" id="hero">
+      <div class="hero-grain"></div>
+      <div class="hero-topline">
+        <span>INDEPENDENT CREATOR</span>
+        <span>TECH / DESIGN / IDEAS</span>
       </div>
 
-      <div class="container hero-content">
-        <div class="hero-label reveal">
-          <span class="status-dot"></span>
-          <span data-i18n="hero.label">INDEPENDENT CREATOR</span>
+      <div class="hero-main">
+        <div class="hero-eyebrow">
+          <span class="live-dot"></span>
+          <span>WELCOME TO MY WORLD</span>
         </div>
 
-        <h1 class="hero-title reveal">
-          Ideas into
-          <span class="hero-title-accent">reality.</span>
+        <h1>
+          Ideas don't<br>
+          <span>stay ideas.</span>
         </h1>
 
-        <p class="hero-description reveal"
-           data-i18n="hero.description">
-          생각에서 시작해, 실제 결과물로 이어지는 과정.
-          기술과 창작을 연결합니다.
+        <p>
+          생각을 떠올리는 데서 멈추지 않는다.<br>
+          직접 만들고, 움직이고, 현실로.
         </p>
 
-        <div class="hero-actions reveal">
-          <a href="#intro" class="btn btn-primary">
-            <span data-i18n="hero.explore">Explore</span>
-            <span class="btn-arrow">↘</span>
-          </a>
+        <a href="#experience" class="hero-continue">
+          <span>SCROLL TO EXPERIENCE</span>
+          <span class="hero-continue-arrow">↓</span>
+        </a>
+      </div>
 
-          <a href="quick-links.html" class="btn btn-outline">
-            <span data-i18n="hero.discover">Discover</span>
-          </a>
-        </div>
+      <div class="hero-side-text">M / 2026</div>
 
-        <div class="hero-bottom reveal">
-          <span data-i18n="hero.scroll">SCROLL TO EXPLORE</span>
-          <div class="scroll-indicator">
-            <div class="scroll-indicator-line"></div>
-          </div>
-        </div>
-
-        <div class="hero-visual">
-          <div class="hero-orb">
-            <div class="orb-ring orb-ring-1"></div>
-            <div class="orb-ring orb-ring-2"></div>
-            <div class="orb-ring orb-ring-3"></div>
-            <div class="orb-core"></div>
-            <div class="orb-light"></div>
-          </div>
-
-          <div class="hero-coordinate coordinate-1">
-            <span>37°</span>
-            <span>IDEA</span>
-          </div>
-
-          <div class="hero-coordinate coordinate-2">
-            <span>∞</span>
-            <span>CREATE</span>
-          </div>
-        </div>
+      <div class="hero-bottomline">
+        <span>MARST</span>
+        <span>IDEAS INTO REALITY</span>
+        <span>01 — 06</span>
       </div>
     </section>
 
 
-    <!-- CINEMATIC SCROLL -->
-    <section class="scroll-scene" id="scroll-scene">
-      <div class="scene-sticky">
+    <!-- =========================================
+         SCROLL EXPERIENCE
+    ========================================== -->
+    <section class="experience" id="experience">
+      <div class="experience-sticky">
 
-        <div class="scene-background">
-          <div class="scene-grid"></div>
-          <div class="scene-glow"></div>
+        <div class="experience-bg">
+          <div class="experience-grid"></div>
+          <div class="experience-vignette"></div>
         </div>
 
-        <div class="scene-top">
-          <span class="scene-label" data-i18n="scene.label">
-            THE PROCESS
-          </span>
-
-          <span class="scene-counter">
-            <span id="scene-current">01</span>
-            <span class="scene-divider">/</span>
-            <span>05</span>
+        <div class="experience-top">
+          <span class="experience-brand">MARST / EXPERIMENT 001</span>
+          <span class="experience-status">
+            <span class="live-dot"></span>
+            <span id="experience-status">INITIALIZING</span>
           </span>
         </div>
 
-        <div class="scene-object">
-          <div class="scene-object-shadow"></div>
+        <!-- Main stage -->
+        <div class="experience-stage">
 
-          <div class="scene-object-core">
-            <div class="scene-object-inner"></div>
-          </div>
-
-          <div class="scene-ring scene-ring-1"></div>
-          <div class="scene-ring scene-ring-2"></div>
-          <div class="scene-ring scene-ring-3"></div>
-
-          <div class="scene-cross scene-cross-1"></div>
-          <div class="scene-cross scene-cross-2"></div>
-          <div class="scene-cross scene-cross-3"></div>
-
-          <div class="scene-particle scene-particle-1"></div>
-          <div class="scene-particle scene-particle-2"></div>
-          <div class="scene-particle scene-particle-3"></div>
-          <div class="scene-particle scene-particle-4"></div>
-        </div>
-
-        <div class="scene-copy-container">
-
-          <div class="scene-copy scene-copy-1 active">
-            <span class="scene-copy-number">01 — BEGIN</span>
-            <h2 data-i18n="scene.one">모든 것은<br>작은 생각에서.</h2>
-          </div>
-
-          <div class="scene-copy scene-copy-2">
-            <span class="scene-copy-number">02 — IMAGINE</span>
-            <h2 data-i18n="scene.two">생각은<br>가능성을 만듭니다.</h2>
-          </div>
-
-          <div class="scene-copy scene-copy-3">
-            <span class="scene-copy-number">03 — CONNECT</span>
-            <h2 data-i18n="scene.three">아이디어와<br>기술을 연결하고.</h2>
-          </div>
-
-          <div class="scene-copy scene-copy-4">
-            <span class="scene-copy-number">04 — CREATE</span>
-            <h2 data-i18n="scene.four">직접 만들고<br>끊임없이 발전시킵니다.</h2>
-          </div>
-
-          <div class="scene-copy scene-copy-5">
-            <span class="scene-copy-number">05 — REALIZE</span>
-            <h2 data-i18n="scene.five">생각을<br>현실로.</h2>
-          </div>
-
-        </div>
-
-        <div class="scene-bottom">
-          <span>MARST</span>
-
-          <div class="scene-progress-track">
-            <div class="scene-progress-bar" id="scene-progress"></div>
-          </div>
-
-          <span class="scene-bottom-right">SCROLL TO CONTINUE</span>
-        </div>
-
-      </div>
-    </section>
-
-
-    <!-- INTRO -->
-    <section class="intro-section section" id="intro">
-      <div class="container">
-
-        <div class="section-heading reveal">
-          <span class="section-label" data-i18n="intro.label">
-            INTRODUCTION
-          </span>
-
-          <h2 class="section-title">
-            <span data-i18n="intro.title1">단순히 생각하는 것을 넘어,</span>
-            <br>
-            <span class="text-muted" data-i18n="intro.title2">
-              직접 만들어냅니다.
-            </span>
-          </h2>
-        </div>
-
-        <div class="intro-grid">
-          <div class="intro-left reveal">
-            <div class="intro-symbol">
-              <div class="intro-symbol-circle">
-                <span>M</span>
-              </div>
-              <div class="intro-symbol-orbit"></div>
+          <!-- The square -->
+          <div class="transform-object" id="transform-object">
+            <div class="transform-square" id="transform-square">
+              <div class="square-inner"></div>
+              <div class="square-cross square-cross-x"></div>
+              <div class="square-cross square-cross-y"></div>
+              <div class="square-corner square-corner-1"></div>
+              <div class="square-corner square-corner-2"></div>
+              <div class="square-corner square-corner-3"></div>
+              <div class="square-corner square-corner-4"></div>
             </div>
           </div>
 
-          <div class="intro-right reveal">
-            <p class="intro-text"
-               data-i18n="intro.description1">
-              새로운 아이디어를 떠올리는 것에서 끝내지 않습니다.
-              직접 설계하고, 개발하고, 실험하고,
-              실제로 작동하는 결과물을 만들어냅니다.
-            </p>
+          <!-- Orbit -->
+          <div class="object-orbit orbit-a"></div>
+          <div class="object-orbit orbit-b"></div>
+          <div class="object-orbit orbit-c"></div>
 
-            <p class="intro-text intro-text-secondary"
-               data-i18n="intro.description2">
-              기술은 아이디어를 현실로 만드는 도구입니다.
-              그리고 그 과정에는 끝이 없습니다.
-            </p>
-
-            <div class="intro-meta">
-              <div class="intro-meta-item">
-                <span class="intro-meta-label">IDENTITY</span>
-                <span class="intro-meta-value">MARST</span>
+          <!-- Browser -->
+          <div class="browser-window" id="browser-window">
+            <div class="browser-toolbar">
+              <div class="browser-dots">
+                <i></i><i></i><i></i>
               </div>
-
-              <div class="intro-meta-item">
-                <span class="intro-meta-label">FIELD</span>
-                <span class="intro-meta-value">TECH · CREATION</span>
+              <div class="browser-address">
+                <span>✦</span>
+                marst.studio/creation
               </div>
-
-              <div class="intro-meta-item">
-                <span class="intro-meta-label">APPROACH</span>
-                <span class="intro-meta-value">IDEA → REALITY</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-      </div>
-    </section>
-
-
-    <!-- FOCUS -->
-    <section class="focus-section section" id="focus">
-      <div class="container">
-
-        <div class="section-heading reveal">
-          <span class="section-label" data-i18n="focus.label">
-            WHAT I DO
-          </span>
-
-          <h2 class="section-title">
-            <span data-i18n="focus.title1">다양한 분야를 탐구하며</span>
-            <br>
-            <span class="text-muted" data-i18n="focus.title2">
-              새로운 것을 만들어갑니다.
-            </span>
-          </h2>
-        </div>
-
-        <div class="focus-grid">
-
-          <!-- TECHNOLOGY -->
-          <article class="focus-card focus-card-large reveal">
-            <div class="focus-card-top">
-              <span class="focus-card-number">01</span>
-              <span class="focus-card-tag">TECHNOLOGY</span>
+              <div class="browser-toolbar-right">↗</div>
             </div>
 
-            <div class="focus-art focus-art-code">
-              <div class="code-window">
-                <div class="code-window-header">
-                  <div class="code-dots">
-                    <span></span><span></span><span></span>
-                  </div>
-                  <span>project.py</span>
-                </div>
-
-                <div class="code-content">
-                  <div class="code-line">
-                    <span class="code-number">01</span>
-                    <span class="code-purple">class</span>
-                    <span class="code-yellow">Idea</span>:
-                  </div>
-
-                  <div class="code-line">
-                    <span class="code-number">02</span>
-                    &nbsp;&nbsp;<span class="code-purple">def</span>
-                    <span class="code-blue">build</span>(self):
-                  </div>
-
-                  <div class="code-line">
-                    <span class="code-number">03</span>
-                    &nbsp;&nbsp;&nbsp;&nbsp;<span class="code-green">return</span>
-                    <span class="code-yellow">reality</span>
-                  </div>
-
-                  <div class="code-line">
-                    <span class="code-number">04</span>
-                    <span class="code-muted"># keep creating</span>
-                  </div>
-
-                  <div class="code-line code-cursor-line">
-                    <span class="code-number">05</span>
-                    <span class="code-cursor"></span>
-                  </div>
+            <div class="browser-content">
+              <div class="browser-nav">
+                <div class="browser-logo">M.</div>
+                <div class="browser-nav-items">
+                  <span>ABOUT</span>
+                  <span>WORK</span>
+                  <span>CONTACT</span>
                 </div>
               </div>
+
+              <div class="browser-hero">
+                <div class="browser-small-label">CREATIVE TECHNOLOGY</div>
+                <div class="browser-title">
+                  MAKE IT<br>
+                  <span>REAL.</span>
+                </div>
+                <div class="browser-description">
+                  Ideas become something<br>
+                  you can experience.
+                </div>
+                <div class="browser-button">EXPLORE ↗</div>
+              </div>
+
+              <div class="browser-decoration">
+                <div class="browser-decoration-square"></div>
+                <div class="browser-decoration-circle"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Code editor -->
+          <div class="code-editor" id="code-editor">
+            <div class="editor-titlebar">
+              <div class="editor-dots">
+                <i></i><i></i><i></i>
+              </div>
+              <span>index.html</span>
+              <span class="editor-right-label">HTML · LIVE</span>
             </div>
 
-            <div class="focus-card-content">
-              <h3 data-i18n="focus.technology.title">
-                Technology
-              </h3>
-
-              <p data-i18n="focus.technology.description">
-                코드와 기술을 활용해 새로운 시스템을 설계하고,
-                문제를 해결하며 작동하는 결과물을 만듭니다.
-              </p>
-
-              <div class="focus-card-footer">
-                <span>DEVELOPMENT</span>
-                <span>↗</span>
+            <div class="editor-body">
+              <div class="editor-lines" id="editor-lines">
+                <div><span class="ln">01</span><span class="tag">&lt;main</span> <span class="attr">class</span>=<span class="str">"world"</span><span class="tag">&gt;</span></div>
+                <div><span class="ln">02</span>&nbsp;&nbsp;<span class="tag">&lt;section</span> <span class="attr">class</span>=<span class="str">"ideas"</span><span class="tag">&gt;</span></div>
+                <div><span class="ln">03</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="tag">&lt;h1&gt;</span></div>
+                <div><span class="ln">04</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ideas into reality.</div>
+                <div><span class="ln">05</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="tag">&lt;/h1&gt;</span></div>
+                <div><span class="ln">06</span>&nbsp;&nbsp;&nbsp;&nbsp;<span class="tag">&lt;p&gt;</span>Keep creating.<span class="tag">&lt;/p&gt;</span></div>
+                <div><span class="ln">07</span>&nbsp;&nbsp;<span class="tag">&lt;/section&gt;</span></div>
+                <div><span class="ln">08</span><span class="tag">&lt;/main&gt;</span></div>
+                <div class="editor-cursor-line"><span class="ln">09</span><span class="typing-cursor"></span></div>
               </div>
+            </div>
+
+            <div class="editor-footer">
+              <span><i class="live-dot"></i> BUILD SUCCESS</span>
+              <span>HTML5</span>
+            </div>
+          </div>
+
+          <!-- Service UI -->
+          <div class="service-ui" id="service-ui">
+
+            <div class="service-topbar">
+              <div class="service-logo">
+                <span class="service-logo-mark">M</span>
+                <span>MARST</span>
+              </div>
+
+              <div class="service-nav">
+                <span>Overview</span>
+                <span>Projects</span>
+                <span>Studio</span>
+              </div>
+
+              <div class="service-profile">
+                <span>MS</span>
+              </div>
+            </div>
+
+            <div class="service-body">
+
+              <div class="service-sidebar">
+                <span class="sidebar-active">◈ &nbsp; Overview</span>
+                <span>▦ &nbsp; Projects</span>
+                <span>⌘ &nbsp; Workspace</span>
+                <span>↗ &nbsp; Analytics</span>
+                <span>⚙ &nbsp; Settings</span>
+              </div>
+
+              <div class="service-main">
+                <div class="service-welcome">
+                  <div>
+                    <span class="service-date">MONDAY, NOVEMBER 24</span>
+                    <h2>Make something<br>remarkable.</h2>
+                  </div>
+                  <div class="service-hero-icon">↗</div>
+                </div>
+
+                <div class="service-stats">
+                  <div class="service-stat">
+                    <span>PROJECTS</span>
+                    <strong>08</strong>
+                    <small>Ideas in progress</small>
+                  </div>
+                  <div class="service-stat">
+                    <span>CREATED</span>
+                    <strong>24<span>+</span></strong>
+                    <small>Experiments & builds</small>
+                  </div>
+                  <div class="service-stat">
+                    <span>STATUS</span>
+                    <strong class="stat-live">ACTIVE</strong>
+                    <small>Always building</small>
+                  </div>
+                </div>
+
+                <div class="service-projects">
+                  <div class="service-project-header">
+                    <span>RECENT PROJECTS</span>
+                    <span>VIEW ALL ↗</span>
+                  </div>
+
+                  <div class="service-project-row">
+                    <div class="project-icon project-icon-1">I</div>
+                    <div class="project-name">
+                      <strong>IEUM Studio</strong>
+                      <small>Creative tools</small>
+                    </div>
+                    <div class="project-status">IN DEVELOPMENT</div>
+                  </div>
+
+                  <div class="service-project-row">
+                    <div class="project-icon project-icon-2">⌘</div>
+                    <div class="project-name">
+                      <strong>Digital Lab</strong>
+                      <small>Technology</small>
+                    </div>
+                    <div class="project-status project-status-live">ACTIVE</div>
+                  </div>
+
+                  <div class="service-project-row">
+                    <div class="project-icon project-icon-3">↗</div>
+                    <div class="project-name">
+                      <strong>Next Idea</strong>
+                      <small>Exploration</small>
+                    </div>
+                    <div class="project-status">PLANNING</div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+          <!-- Final object -->
+          <div class="final-object" id="final-object">
+            <div class="final-object-ring"></div>
+            <div class="final-object-ring final-object-ring-2"></div>
+            <div class="final-object-core">M.</div>
+          </div>
+
+          <!-- Text stages -->
+          <div class="experience-copy" id="experience-copy">
+            <div class="experience-text text-stage-1">
+              <span class="stage-number">01 / AN IDEA</span>
+              <h2>모든 것은<br>작은 생각에서.</h2>
+              <p>Something begins.</p>
+            </div>
+
+            <div class="experience-text text-stage-2">
+              <span class="stage-number">02 / MOVEMENT</span>
+              <h2>생각은<br>움직이기 시작한다.</h2>
+              <p>It doesn't have to stay still.</p>
+            </div>
+
+            <div class="experience-text text-stage-3">
+              <span class="stage-number">03 / CREATION</span>
+              <h2>직접 만들고<br>형태를 갖추고.</h2>
+              <p>From imagination to structure.</p>
+            </div>
+
+            <div class="experience-text text-stage-4">
+              <span class="stage-number">04 / EXPERIENCE</span>
+              <h2>이제 실제로<br>작동하는 무언가가 된다.</h2>
+              <p>Not just a concept. An experience.</p>
+            </div>
+
+            <div class="experience-text text-stage-5">
+              <span class="stage-number">05 / MARST</span>
+              <h2>Ideas into<br><span>reality.</span></h2>
+              <p>And it starts all over again.</p>
+            </div>
+          </div>
+
+        </div>
+
+        <div class="experience-bottom">
+          <span id="experience-step">01 / 05</span>
+          <div class="experience-progress">
+            <div id="experience-progress-bar"></div>
+          </div>
+          <span>SCROLL TO BUILD</span>
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- =========================================
+         INTRODUCTION
+    ========================================== -->
+    <section class="marst-intro" id="intro">
+      <div class="intro-container">
+
+        <div class="intro-label reveal">
+          <span class="live-dot"></span>
+          A LITTLE INTRODUCTION
+        </div>
+
+        <h2 class="intro-headline reveal">
+          안녕, 나는 <span>Marst.</span>
+        </h2>
+
+        <div class="intro-columns reveal">
+          <div class="intro-large">
+            아이디어를 생각하고,<br>
+            직접 만드는 것을 좋아한다.
+          </div>
+
+          <div class="intro-detail">
+            <p>
+              기술, 코딩, AI, 웹, 다양한 프로젝트.
+              단순히 관심을 가지는 것에 그치지 않고,
+              직접 만들고 실험하면서 새로운 가능성을 찾아간다.
+            </p>
+
+            <p>
+              완벽하지 않더라도 시작하고,
+              문제를 만나면 해결하고,
+              더 나은 결과를 만들기 위해 계속 발전시킨다.
+            </p>
+          </div>
+        </div>
+
+        <div class="intro-divider"></div>
+
+        <div class="intro-meta-grid reveal">
+          <div>
+            <span>INTEREST</span>
+            <strong>Technology / AI / Code</strong>
+          </div>
+          <div>
+            <span>APPROACH</span>
+            <strong>Think. Build. Improve.</strong>
+          </div>
+          <div>
+            <span>OBJECTIVE</span>
+            <strong>Ideas into Reality</strong>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- =========================================
+         WHAT I CREATE
+    ========================================== -->
+    <section class="marst-work" id="work">
+      <div class="work-container">
+
+        <div class="work-heading reveal">
+          <div>
+            <span class="section-overline">BEYOND THE IDEA</span>
+            <h2>Things I<br>bring to life.</h2>
+          </div>
+          <p>
+            서로 다른 분야, 하나의 방향.<br>
+            새로운 것을 만들고 직접 경험한다.
+          </p>
+        </div>
+
+        <div class="work-grid">
+
+          <article class="work-card work-card-main reveal">
+            <div class="work-visual work-visual-code">
+              <div class="work-code-window">
+                <div class="mini-window-top">
+                  <i></i><i></i><i></i>
+                  <span>development</span>
+                </div>
+                <div class="mini-code">
+                  <p><b>const</b> idea = <em>"something new"</em>;</p>
+                  <p><b>function</b> <u>create</u>() {</p>
+                  <p>&nbsp;&nbsp;return idea;</p>
+                  <p>}</p>
+                  <p class="mini-code-last">create(); <span>▋</span></p>
+                </div>
+              </div>
+            </div>
+
+            <div class="work-card-info">
+              <div>
+                <span>01 / TECHNOLOGY</span>
+                <h3>Code & Development</h3>
+                <p>직접 개발하고, 작동하는 것을 만든다.</p>
+              </div>
+              <span class="work-arrow">↗</span>
             </div>
           </article>
 
-
-          <!-- DIGITAL -->
-          <article class="focus-card reveal">
-            <div class="focus-card-top">
-              <span class="focus-card-number">02</span>
-              <span class="focus-card-tag">DIGITAL</span>
+          <article class="work-card reveal">
+            <div class="work-visual work-visual-idea">
+              <div class="idea-visual-grid"></div>
+              <div class="idea-visual-shape idea-shape-a"></div>
+              <div class="idea-visual-shape idea-shape-b"></div>
+              <div class="idea-visual-shape idea-shape-c"></div>
+              <div class="idea-visual-center">IDEA<br><span>→</span></div>
             </div>
 
-            <div class="focus-art focus-art-digital">
-              <div class="digital-orbit digital-orbit-1"></div>
-              <div class="digital-orbit digital-orbit-2"></div>
-              <div class="digital-orbit digital-orbit-3"></div>
-
-              <div class="digital-sphere">
-                <div class="digital-sphere-shine"></div>
+            <div class="work-card-info">
+              <div>
+                <span>02 / EXPLORATION</span>
+                <h3>Ideas & Experiments</h3>
+                <p>궁금한 것들을 탐구하고 실험한다.</p>
               </div>
-
-              <div class="digital-node digital-node-1"></div>
-              <div class="digital-node digital-node-2"></div>
-              <div class="digital-node digital-node-3"></div>
-            </div>
-
-            <div class="focus-card-content">
-              <h3 data-i18n="focus.digital.title">
-                Digital
-              </h3>
-
-              <p data-i18n="focus.digital.description">
-                웹과 디지털 환경을 탐구하고,
-                새로운 경험과 서비스를 구성합니다.
-              </p>
-
-              <div class="focus-card-footer">
-                <span>DIGITAL EXPERIENCE</span>
-                <span>↗</span>
-              </div>
+              <span class="work-arrow">↗</span>
             </div>
           </article>
 
-
-          <!-- IDEAS -->
-          <article class="focus-card reveal">
-            <div class="focus-card-top">
-              <span class="focus-card-number">03</span>
-              <span class="focus-card-tag">IDEAS</span>
-            </div>
-
-            <div class="focus-art focus-art-ideas">
-              <div class="idea-shape idea-shape-1"></div>
-              <div class="idea-shape idea-shape-2"></div>
-              <div class="idea-shape idea-shape-3"></div>
-              <div class="idea-shape idea-shape-4"></div>
-              <div class="idea-center">IDEA</div>
-            </div>
-
-            <div class="focus-card-content">
-              <h3 data-i18n="focus.ideas.title">
-                Ideas
-              </h3>
-
-              <p data-i18n="focus.ideas.description">
-                기존의 방식에서 벗어나 새로운 가능성을 발견하고,
-                아이디어를 구체적인 계획으로 발전시킵니다.
-              </p>
-
-              <div class="focus-card-footer">
-                <span>EXPLORATION</span>
-                <span>↗</span>
+          <article class="work-card reveal">
+            <div class="work-visual work-visual-digital">
+              <div class="digital-card">
+                <div class="digital-card-head">
+                  <span>M / LAB</span>
+                  <span>●</span>
+                </div>
+                <div class="digital-card-body">
+                  <div class="digital-card-big">01</div>
+                  <div class="digital-card-line"></div>
+                  <div class="digital-card-line short"></div>
+                  <div class="digital-card-bars">
+                    <i></i><i></i><i></i><i></i><i></i>
+                  </div>
+                </div>
               </div>
+            </div>
+
+            <div class="work-card-info">
+              <div>
+                <span>03 / DIGITAL</span>
+                <h3>Web & Digital</h3>
+                <p>디지털 공간에서 새로운 경험을 설계한다.</p>
+              </div>
+              <span class="work-arrow">↗</span>
             </div>
           </article>
 
-
-          <!-- CREATION -->
-          <article class="focus-card focus-card-wide reveal">
-            <div class="focus-card-top">
-              <span class="focus-card-number">04</span>
-              <span class="focus-card-tag">CREATION</span>
+          <article class="work-card reveal">
+            <div class="work-visual work-visual-creation">
+              <div class="creation-visual-plane plane-1"></div>
+              <div class="creation-visual-plane plane-2"></div>
+              <div class="creation-visual-plane plane-3"></div>
+              <div class="creation-visual-label">MAKE<br>IT REAL.</div>
             </div>
 
-            <div class="focus-art focus-art-creation">
-              <div class="creation-block creation-block-1"></div>
-              <div class="creation-block creation-block-2"></div>
-              <div class="creation-block creation-block-3"></div>
-              <div class="creation-block creation-block-4"></div>
-
-              <div class="creation-line creation-line-1"></div>
-              <div class="creation-line creation-line-2"></div>
-
-              <div class="creation-center">
-                <span>BUILD</span>
-                <span>→</span>
-                <span>CREATE</span>
+            <div class="work-card-info">
+              <div>
+                <span>04 / CREATION</span>
+                <h3>Projects</h3>
+                <p>생각을 실제 프로젝트로 완성한다.</p>
               </div>
-            </div>
-
-            <div class="focus-card-content">
-              <h3 data-i18n="focus.creation.title">
-                Creation
-              </h3>
-
-              <p data-i18n="focus.creation.description">
-                상상했던 것을 직접 구현하고,
-                하나의 완성된 프로젝트로 만들어냅니다.
-              </p>
-
-              <div class="focus-card-footer">
-                <span>BUILD SOMETHING</span>
-                <span>↗</span>
-              </div>
+              <span class="work-arrow">↗</span>
             </div>
           </article>
 
@@ -423,260 +481,119 @@ export function renderHome() {
     </section>
 
 
-    <!-- PROCESS -->
-    <section class="process-section section" id="process">
-      <div class="container">
+    <!-- =========================================
+         PHILOSOPHY
+    ========================================== -->
+    <section class="marst-philosophy" id="philosophy">
+      <div class="philosophy-container">
 
-        <div class="section-heading reveal">
-          <span class="section-label" data-i18n="process.label">
-            HOW IT WORKS
-          </span>
+        <span class="section-overline reveal">A SIMPLE PHILOSOPHY</span>
 
-          <h2 class="section-title">
-            <span data-i18n="process.title1">아이디어에서</span>
-            <br>
-            <span class="text-muted" data-i18n="process.title2">
-              결과물까지.
-            </span>
+        <div class="philosophy-quote reveal">
+          <span class="quote-mark">“</span>
+          <h2>
+            생각만 하고 끝내면<br>
+            <span>아무것도 바뀌지 않는다.</span>
           </h2>
         </div>
 
-        <div class="process-list">
-
-          <div class="process-item reveal">
-            <div class="process-number">01</div>
-
-            <div class="process-main">
-              <h3 data-i18n="process.step1.title">Think</h3>
-              <p data-i18n="process.step1.description">
-                새로운 아이디어와 문제를 발견하고
-                방향을 고민합니다.
-              </p>
-            </div>
-
-            <div class="process-symbol">↗</div>
-          </div>
-
-          <div class="process-item reveal">
-            <div class="process-number">02</div>
-
-            <div class="process-main">
-              <h3 data-i18n="process.step2.title">Plan</h3>
-              <p data-i18n="process.step2.description">
-                생각을 구체화하고 필요한 기술과 구조를 설계합니다.
-              </p>
-            </div>
-
-            <div class="process-symbol">⌘</div>
-          </div>
-
-          <div class="process-item reveal">
-            <div class="process-number">03</div>
-
-            <div class="process-main">
-              <h3 data-i18n="process.step3.title">Build</h3>
-              <p data-i18n="process.step3.description">
-                코드와 도구를 활용해 직접 구현합니다.
-              </p>
-            </div>
-
-            <div class="process-symbol">↗</div>
-          </div>
-
-          <div class="process-item reveal">
-            <div class="process-number">04</div>
-
-            <div class="process-main">
-              <h3 data-i18n="process.step4.title">Improve</h3>
-              <p data-i18n="process.step4.description">
-                테스트하고 개선하며 완성도를 높입니다.
-              </p>
-            </div>
-
-            <div class="process-symbol">∞</div>
-          </div>
-
-        </div>
-
-      </div>
-    </section>
-
-
-    <!-- ACCESS -->
-    <section class="access-section section" id="access">
-      <div class="container">
-
-        <div class="section-heading reveal">
-          <span class="section-label" data-i18n="access.label">
-            EXPLORE MORE
-          </span>
-
-          <h2 class="section-title">
-            <span data-i18n="access.title1">더 많은 것들을</span>
-            <br>
-            <span class="text-muted" data-i18n="access.title2">
-              만나보세요.
-            </span>
-          </h2>
-        </div>
-
-        <div class="access-grid">
-
-          <!-- HISTORY -->
-          <a href="history.html" class="access-card reveal">
-            <div class="access-card-top">
-              <span class="access-card-index">01</span>
-              <span class="access-card-arrow">↗</span>
-            </div>
-
-            <div class="access-card-visual access-history-visual">
-              <div class="history-line"></div>
-              <div class="history-node history-node-1"></div>
-              <div class="history-node history-node-2"></div>
-              <div class="history-node history-node-3"></div>
-              <div class="history-year">2026</div>
-            </div>
-
-            <div class="access-card-bottom">
-              <div>
-                <h3 data-i18n="access.history.title">History</h3>
-                <p data-i18n="access.history.description">
-                  지금까지의 과정과 기록
-                </p>
-              </div>
-
-              <span class="access-arrow">↗</span>
-            </div>
-          </a>
-
-
-          <!-- QUICK LINKS -->
-          <a href="quick-links.html" class="access-card reveal">
-            <div class="access-card-top">
-              <span class="access-card-index">02</span>
-              <span class="access-card-arrow">↗</span>
-            </div>
-
-            <div class="access-card-visual access-links-visual">
-              <div class="link-tile link-tile-1">01</div>
-              <div class="link-tile link-tile-2">02</div>
-              <div class="link-tile link-tile-3">03</div>
-              <div class="link-tile link-tile-4">04</div>
-            </div>
-
-            <div class="access-card-bottom">
-              <div>
-                <h3 data-i18n="access.links.title">Quick Links</h3>
-                <p data-i18n="access.links.description">
-                  다양한 프로젝트와 연결
-                </p>
-              </div>
-
-              <span class="access-arrow">↗</span>
-            </div>
-          </a>
-
-
-          <!-- PURCHASE -->
-          <a href="purchase.html" class="access-card reveal" data-auth>
-            <div class="access-card-top">
-              <span class="access-card-index">03</span>
-              <span class="access-card-arrow">↗</span>
-            </div>
-
-            <div class="access-card-visual access-purchase-visual">
-              <div class="purchase-ring"></div>
-              <div class="purchase-ring purchase-ring-2"></div>
-              <div class="purchase-core">
-                <span>SHOP</span>
-              </div>
-            </div>
-
-            <div class="access-card-bottom">
-              <div>
-                <h3 data-i18n="access.purchase.title">Purchase</h3>
-                <p data-i18n="access.purchase.description">
-                  제작한 제품과 서비스
-                </p>
-              </div>
-
-              <span class="access-arrow">↗</span>
-            </div>
-          </a>
-
-
-          <!-- CONSULT -->
-          <a href="consult.html" class="access-card reveal" data-auth>
-            <div class="access-card-top">
-              <span class="access-card-index">04</span>
-              <span class="access-card-arrow">↗</span>
-            </div>
-
-            <div class="access-card-visual access-consult-visual">
-              <div class="consult-dot consult-dot-1"></div>
-              <div class="consult-dot consult-dot-2"></div>
-              <div class="consult-dot consult-dot-3"></div>
-              <div class="consult-connect"></div>
-
-              <div class="consult-center">
-                <span>LET'S</span>
-                <span>CONNECT</span>
-              </div>
-            </div>
-
-            <div class="access-card-bottom">
-              <div>
-                <h3 data-i18n="access.consult.title">Consult</h3>
-                <p data-i18n="access.consult.description">
-                  문의 및 협업 제안
-                </p>
-              </div>
-
-              <span class="access-arrow">↗</span>
-            </div>
-          </a>
-
-        </div>
-      </div>
-    </section>
-
-
-    <!-- FINAL CTA -->
-    <section class="final-section section" id="final">
-      <div class="container">
-
-        <div class="final-content reveal">
-          <div class="final-orb">
-            <div class="final-orb-ring"></div>
-            <div class="final-orb-core"></div>
-          </div>
-
-          <span class="section-label" data-i18n="final.label">
-            THE NEXT STEP
-          </span>
-
-          <h2 class="final-title">
-            <span data-i18n="final.title1">생각은</span>
-            <span class="final-title-accent"
-                  data-i18n="final.title2">계속됩니다.</span>
-          </h2>
-
-          <p class="final-description" data-i18n="final.description">
-            새로운 아이디어는 언제든 시작될 수 있습니다.
-            그리고 그것을 현실로 만드는 과정은 계속됩니다.
+        <div class="philosophy-bottom reveal">
+          <p>
+            작은 시작도 결과가 될 수 있다.<br>
+            중요한 건 실제로 시작하고 만들어가는 것.
           </p>
 
-          <a href="history.html" class="btn btn-primary final-button">
-            <span data-i18n="final.button">Explore MARST</span>
-            <span class="btn-arrow">↗</span>
+          <div class="philosophy-stamp">
+            <span>THINK</span>
+            <span>↓</span>
+            <span>MAKE</span>
+            <span>↓</span>
+            <span>REALITY</span>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- =========================================
+         LINKS
+    ========================================== -->
+    <section class="marst-links" id="access">
+      <div class="links-container">
+
+        <div class="links-heading reveal">
+          <span class="section-overline">OPEN THE DOORS</span>
+          <h2>Explore<br>what's next.</h2>
+        </div>
+
+        <div class="links-list">
+
+          <a href="history.html" class="link-row reveal">
+            <span class="link-row-number">01</span>
+            <span class="link-row-name">History</span>
+            <span class="link-row-desc">The journey so far</span>
+            <span class="link-row-arrow">↗</span>
           </a>
-        </div>
 
-        <div class="final-bottom">
-          <span>MARST — INDEPENDENT CREATOR</span>
-          <span>IDEAS INTO REALITY.</span>
-        </div>
+          <a href="quick-links.html" class="link-row reveal">
+            <span class="link-row-number">02</span>
+            <span class="link-row-name">Quick Links</span>
+            <span class="link-row-desc">Things connected to Marst</span>
+            <span class="link-row-arrow">↗</span>
+          </a>
 
+          <a href="purchase.html" class="link-row reveal" data-auth>
+            <span class="link-row-number">03</span>
+            <span class="link-row-name">Purchase</span>
+            <span class="link-row-desc">Products & services</span>
+            <span class="link-row-arrow">↗</span>
+          </a>
+
+          <a href="consult.html" class="link-row reveal" data-auth>
+            <span class="link-row-number">04</span>
+            <span class="link-row-name">Consult</span>
+            <span class="link-row-desc">Contact & collaboration</span>
+            <span class="link-row-arrow">↗</span>
+          </a>
+
+        </div>
+      </div>
+    </section>
+
+
+    <!-- =========================================
+         FINAL
+    ========================================== -->
+    <section class="marst-final" id="final">
+      <div class="final-background">
+        <div class="final-grid"></div>
+        <div class="final-glow"></div>
+      </div>
+
+      <div class="final-content reveal">
+        <span class="section-overline">THIS IS ONLY THE BEGINNING</span>
+
+        <h2>
+          The next idea<br>
+          is <span>waiting.</span>
+        </h2>
+
+        <p>
+          아직 만들어지지 않은 것들.<br>
+          앞으로 만들어갈 수많은 가능성.
+        </p>
+
+        <a href="history.html" class="final-cta">
+          <span>GET TO KNOW MARST</span>
+          <span>↗</span>
+        </a>
+      </div>
+
+      <div class="final-footerline">
+        <span>MARST © 2026</span>
+        <span>IDEAS INTO REALITY</span>
+        <span>END / BEGIN</span>
       </div>
     </section>
   `;
