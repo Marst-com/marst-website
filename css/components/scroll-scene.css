@@ -3,6 +3,30 @@
    CSS Sticky 사용 안 함
 ========================================= */
 
+/* 3D 장면은 헤더보다 아래에 */
+.story-sticky.story-pinned {
+    z-index: 20 !important;
+}
+
+/* 헤더는 항상 위 */
+header,
+.site-header,
+#site-header,
+.marst-header {
+    position: relative !important;
+    z-index: 1000 !important;
+}
+
+/* 헤더가 고정형이라면 화면 상단 유지 */
+header.is-fixed,
+.site-header.is-fixed,
+#site-header.is-fixed {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    right: 0;
+}
+
 .scroll-story {
     position: relative !important;
     display: block !important;
