@@ -262,3 +262,52 @@
         width: 18vw;
     }
 }
+
+.story-sticky {
+    background: #080908 !important;
+    perspective: 1200px;
+}
+
+#story-canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.story-copy {
+    z-index: 5;
+    mix-blend-mode: screen;
+}
+
+.story-copy h2 {
+    font-weight: 700;
+    line-height: 0.94;
+    letter-spacing: -0.055em;
+}
+
+.story-copy p {
+    letter-spacing: -0.01em;
+}
+
+.story-top,
+.story-bottom {
+    mix-blend-mode: difference;
+}
+
+/* 입체감과 시네마틱 분위기 */
+.story-sticky::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+
+    background:
+        radial-gradient(
+            ellipse at 55% 48%,
+            transparent 30%,
+            rgba(0, 0, 0, 0.12) 70%,
+            rgba(0, 0, 0, 0.55) 100%
+        );
+
+    z-index: 2;
+}
