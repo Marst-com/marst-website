@@ -1,12 +1,19 @@
-
 import { SITE } from "./config.js";
 
-import { renderHeader } from "./components/header.js";
-import { renderFooter } from "./components/footer.js";
+import {
+  renderHeader as createHeader
+} from "./components/header.js";
+
+import {
+  renderFooter as createFooter
+} from "./components/footer.js";
+
 import { initReveal } from "./components/reveal.js";
 import { initScrollScene } from "./components/scroll-scene.js";
 
-import { renderHome } from "./pages/home.js";
+import {
+  renderHome as createHome
+} from "./pages/home.js";
 
 import { initTheme } from "./core/theme.js";
 import { initLanguage } from "./core/language.js";
@@ -17,9 +24,15 @@ import { initLanguage } from "./core/language.js";
 ========================================================= */
 
 const Marst = {
-  version: "1.0.0",
+  version: "1.0.1",
+
+  initialized: false,
 
   init() {
+    if (this.initialized) return;
+
+    this.initialized = true;
+
     this.prepareDocument();
     this.render();
     this.initializeFeatures();
@@ -31,7 +44,7 @@ const Marst = {
       "color:#dfff72;font-size:20px;font-weight:900;"
     );
 
-    console.log("MARST website initialized.");
+    console.log(`MARST website initialized · v${this.version}`);
   },
 
 
@@ -41,7 +54,6 @@ const Marst = {
 
   prepareDocument() {
     document.documentElement.classList.add("js-enabled");
-
     document.body.classList.add("marst-app");
 
     document.documentElement.dataset.theme =
@@ -50,7 +62,8 @@ const Marst = {
     document.documentElement.lang =
       localStorage.getItem("marst_language") || "en";
 
-    document.title = `${SITE.name || "MARST"} — Ideas into Reality`;
+    document.title =
+      `${SITE.name || "MARST"} — Ideas into Reality`;
   },
 
 
@@ -64,6 +77,7 @@ const Marst = {
     this.renderFooter();
   },
 
+
   renderHeader() {
     const header = document.querySelector("#header");
 
@@ -72,8 +86,9 @@ const Marst = {
       return;
     }
 
-    renderHeader();
+    createHeader();
   },
+
 
   renderHome() {
     const home = document.querySelector("#home-page");
@@ -83,8 +98,9 @@ const Marst = {
       return;
     }
 
-    renderHome();
+    createHome();
   },
+
 
   renderFooter() {
     const footer = document.querySelector("#footer");
@@ -94,7 +110,7 @@ const Marst = {
       return;
     }
 
-    renderFooter();
+    createFooter();
   },
 
 
@@ -119,9 +135,7 @@ const Marst = {
   ========================================================= */
 
   initializeAuth() {
-    const authLinks = document.querySelectorAll("[data-auth]");
-
-    authLinks.forEach(link => {
+    document.querySelectorAll("[data-auth]").forEach(link => {
       link.addEventListener("click", event => {
         const loggedIn =
           localStorage.getItem("marst_logged_in") === "true";
@@ -153,13 +167,12 @@ const Marst = {
     const currentPage =
       window.location.pathname.split("/").pop() || "index.html";
 
-    document.body.dataset.page = currentPage.replace(".html", "");
+    document.body.dataset.page =
+      currentPage.replace(".html", "");
 
-    const currentNav = document.querySelectorAll(
+    document.querySelectorAll(
       ".nav-link, .mobile-nav-link"
-    );
-
-    currentNav.forEach(link => {
+    ).forEach(link => {
       const href = link.getAttribute("href");
 
       if (!href) return;
@@ -168,8 +181,7 @@ const Marst = {
 
       if (normalizedHref === currentPage) {
         link.classList.add("active");
-      }
-      else {
+      } else {
         link.classList.remove("active");
       }
     });
@@ -210,9 +222,14 @@ const Marst = {
 
   bindExternalLinks() {
     document.querySelectorAll('a[target="_blank"]').forEach(link => {
-      if (!link.rel.includes("noopener")) {
-        link.rel = "noopener noreferrer";
-      }
+      const relTokens = new Set(
+        link.rel.split(/\s+/).filter(Boolean)
+      );
+
+      relTokens.add("noopener");
+      relTokens.add("noreferrer");
+
+      link.rel = [...relTokens].join(" ");
     });
   },
 
@@ -236,11 +253,12 @@ const Marst = {
 
     if (document.readyState === "complete") {
       setTimeout(hide, 250);
-    }
-    else {
-      window.addEventListener("load", () => {
-        setTimeout(hide, 250);
-      }, { once: true });
+    } else {
+      window.addEventListener(
+        "load",
+        () => setTimeout(hide, 250),
+        { once: true }
+      );
     }
   }
 };
@@ -253,8 +271,7 @@ const Marst = {
 function boot() {
   try {
     Marst.init();
-  }
-  catch (error) {
+  } catch (error) {
     console.error("[MARST] Initialization failed:", error);
 
     const loader = document.querySelector("#app-loader");
@@ -266,9 +283,10 @@ function boot() {
 }
 
 if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", boot, { once: true });
-}
-else {
+  document.addEventListener("DOMContentLoaded", boot, {
+    once: true
+  });
+} else {
   boot();
 }
 
