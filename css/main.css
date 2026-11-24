@@ -14,6 +14,6 @@
 
 @import url("./responsive.css");
 
-
+@import url("./components/loader.css");
 @import url("./themes.css");
 @import url("./components/scroll-scene.css");
