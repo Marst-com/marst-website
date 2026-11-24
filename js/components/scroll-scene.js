@@ -583,117 +583,238 @@ export function initScrollScene() {
     // ==============================
 
     function updateObjects(p) {
-        const expansion = smooth(0.08, 0.52, p);
-        const architecture = smooth(0.32, 0.75, p);
-        const interfacePhase = smooth(0.64, 0.88, p);
-        const finalPhase = smooth(0.85, 1, p);
+        const designPhase = smooth(0.08, 0.30, p);
+        const codePhase = smooth(0.30, 0.52, p);
+        const webPhase = smooth(0.52, 0.74, p);
+        const servicePhase = smooth(0.74, 0.91, p);
+        const finalPhase = smooth(0.91, 1, p);
 
-        // Original cube
-        mainObject.scale.setScalar(lerp(1, 0.25, expansion));
-        mainObject.rotation.x = p * 2.3;
-        mainObject.rotation.y = p * 3.2;
-        mainObject.rotation.z = p * 1.4;
-        mainObject.position.y = Math.sin(p * 6) * 0.2;
+        const mobile = window.innerWidth < 768;
+        const spacing = mobile ? 0.48 : 0.68;
 
-        mainCube.material = p < 0.5 ? limeMetal : silver;
+        // 각 요소의 정돈된 목적지 생성
+        function designPosition(i) {
+            const col = i % 9;
+            const row = Math.floor(i / 9);
 
-        innerCube.scale.setScalar(lerp(1, 0.35, expansion));
-        innerCube.rotation.x = -p * 3;
-        innerCube.rotation.y = p * 4;
+            return new THREE.Vector3(
+                (col - 4) * spacing,
+                (3.5 - row) * spacing,
+                ((col + row) % 3) * 0.12
+            );
+        }
 
-        cubeWire.scale.setScalar(lerp(1, 2.4, expansion));
-        cubeWire.rotation.copy(mainObject.rotation);
+        // 코드 에디터 형태
+        function codePosition(i) {
+            const row = Math.floor(i / 12);
+            const col = i % 12;
 
-        core.scale.setScalar(lerp(1, 0.6, expansion));
+            const lengths = [7, 10, 5, 9, 6, 11];
 
-        // Multi cubes: explosion -> architecture -> service
-        modules.forEach((item) => {
-            const { group, start, end, service } = item;
+            const visible = col < (lengths[row % lengths.length] || 5);
 
-            const target = new THREE.Vector3()
-                .copy(start)
-                .lerp(end, expansion)
-                .lerp(service, interfacePhase);
+            return new THREE.Vector3(
+                -3.9 + col * 0.7,
+                2.2 - row * 0.62,
+                visible ? 0.2 + (row % 2) * 0.15 : -0.3
+            );
+        }
 
-            const wave = Math.sin(p * 10 + item.phase) * (1 - architecture) * 0.45;
+        // 브라우저 레이아웃
+        function webPosition(i) {
+            const col = i % 9;
+            const row = Math.floor(i / 9);
 
-            target.y += wave;
+            let x = (col - 4) * 0.68;
+            let y = (3.5 - row) * 0.68;
+
+            // 상단 내비게이션
+            if (row === 0) {
+                y = 2.6;
+                x = (col - 4) * 0.68;
+            }
+
+            // 메인 콘텐츠 영역
+            if (row >= 1 && row <= 4) {
+                y = 1.6 - (row - 1) * 0.68;
+            }
+
+            // 하단 영역
+            if (row >= 5) {
+                y = -2.1 - (row - 5) * 0.55;
+            }
+
+            return new THREE.Vector3(x, y, 0);
+        }
+
+        // 대시보드 형태
+        function servicePosition(i) {
+            const col = i % 9;
+            const row = Math.floor(i / 9);
+
+            const x = (col - 4) * 0.68;
+            const y = (3.5 - row) * 0.68;
+
+            return new THREE.Vector3(x, y, 0);
+        }
+
+        function mixPosition(a, b, t) {
+            return a.clone().lerp(b, t);
+        }
+
+        // 최초 큐브
+        mainObject.position.set(0, 0, 0);
+        mainObject.scale.setScalar(
+            lerp(1, 0.22, designPhase)
+        );
+
+        mainObject.rotation.set(
+            p * 0.5,
+            p * Math.PI * 0.8,
+            p * 0.2
+        );
+
+        mainCube.material = p > 0.52 ? silver : limeMetal;
+
+        innerCube.scale.setScalar(lerp(1, 0.3, designPhase));
+        innerCube.rotation.set(p, p * 1.2, 0);
+
+        cubeWire.scale.setScalar(lerp(1, 1.8, designPhase));
+
+        // 사각형 모듈
+        modules.forEach((item, i) => {
+            const { group } = item;
+
+            const start = item.start.clone().multiplyScalar(0.25);
+            const design = designPosition(i);
+            const code = codePosition(i);
+            const web = webPosition(i);
+            const service = servicePosition(i);
+
+            let target = start;
+
+            // 하나의 큐브에서 디자인 구조로
+            target = mixPosition(target, design, designPhase);
+
+            // 디자인에서 코드 구조로
+            target = mixPosition(target, code, codePhase);
+
+            // 코드에서 웹 레이아웃으로
+            target = mixPosition(target, web, webPhase);
+
+            // 웹에서 서비스 대시보드로
+            target = mixPosition(target, service, servicePhase);
+
+            // 작은 깊이 차이로 입체감 유지
+            const depth = Math.sin(i * 1.7) * 0.12;
+
+            target.z += depth;
 
             group.position.copy(target);
 
-            group.rotation.x = lerp(
-                item.startRotation.x,
-                item.endRotation.x,
-                expansion
+            // 요소별 무작위 회전 제거
+            // 회전도 일정한 패턴으로 정렬
+            const rotation = lerp(
+                Math.PI * 0.25,
+                0,
+                Math.max(designPhase, codePhase, webPhase, servicePhase)
             );
 
-            group.rotation.y = lerp(
-                item.startRotation.y,
-                item.endRotation.y,
-                expansion
+            group.rotation.set(
+                rotation * 0.3,
+                rotation * 0.5,
+                rotation
             );
 
-            group.rotation.z = lerp(
-                item.startRotation.z,
-                item.endRotation.z,
-                expansion
+            // 사각형 크기 통일감
+            const scale = lerp(
+                0.2,
+                0.62,
+                designPhase
             );
 
-            // UI formation becomes more aligned
-            group.rotation.x = lerp(group.rotation.x, 0, interfacePhase);
-            group.rotation.y = lerp(group.rotation.y, 0, interfacePhase);
-            group.rotation.z = lerp(group.rotation.z, 0, interfacePhase);
-
-            const scale = lerp(item.scaleStart, item.scaleEnd, expansion);
             group.scale.setScalar(scale);
 
-            group.scale.multiplyScalar(lerp(1, 0.72, interfacePhase));
-            group.scale.multiplyScalar(lerp(1, 0.2, finalPhase));
-        });
-
-        // Metal platforms
-        plates.forEach((item, i) => {
-            const { mesh, start, end, phase } = item;
-
-            mesh.position.copy(start).lerp(end, expansion);
-
-            mesh.position.y += Math.sin(p * 5 + phase) * 0.3;
-
-            mesh.rotation.x = lerp(mesh.rotation.x, 0, interfacePhase);
-            mesh.rotation.z = lerp(mesh.rotation.z, 0, interfacePhase);
-
-            mesh.scale.setScalar(lerp(0.2, 1.2, expansion));
-            mesh.scale.multiplyScalar(lerp(1, 0.3, finalPhase));
-        });
-
-        // Rings
-        rings.forEach((item, i) => {
-            const { mesh, initialScale } = item;
-
-            mesh.scale.setScalar(
-                initialScale * lerp(0.5, 2.5 + i * 0.2, expansion)
+            // 마지막에는 중심으로 모임
+            group.position.lerp(
+                new THREE.Vector3(
+                    (i % 9 - 4) * 0.12,
+                    (Math.floor(i / 9) - 3.5) * 0.12,
+                    0
+                ),
+                finalPhase
             );
 
-            mesh.rotation.x += 0.001 * (i + 1);
-            mesh.rotation.y += 0.002 * (i + 1);
-
-            mesh.material.opacity = 0.2 * (1 - finalPhase);
+            group.scale.multiplyScalar(
+                lerp(1, 0.35, finalPhase)
+            );
         });
 
-        // Particles drift
+        // 바닥 판도 구조에 맞춰 정렬
+        plates.forEach((item, i) => {
+            const col = i % 4;
+            const row = Math.floor(i / 4);
+
+            const target = new THREE.Vector3(
+                (col - 1.5) * 2.1,
+                (1.5 - row) * 1.5,
+                -0.6
+            );
+
+            item.mesh.position.lerp(target, designPhase);
+
+            item.mesh.rotation.x = lerp(
+                item.mesh.rotation.x,
+                0,
+                designPhase
+            );
+
+            item.mesh.rotation.z = lerp(
+                item.mesh.rotation.z,
+                0,
+                designPhase
+            );
+
+            item.mesh.scale.setScalar(
+                lerp(0.2, 0.8, designPhase)
+            );
+        });
+
+        // 링은 장식이 아닌 구조를 강조하는 역할
+        rings.forEach((item, i) => {
+            const ring = item.mesh;
+
+            ring.scale.setScalar(
+                lerp(0.4, 1.4 + i * 0.1, designPhase)
+            );
+
+            ring.rotation.set(
+                Math.PI / 2,
+                0,
+                0
+            );
+
+            ring.material.opacity =
+                0.12 * (1 - servicePhase);
+        });
+
+        // 파티클도 중심에서 바깥으로 확장
         const positions = particleGeometry.attributes.position.array;
 
         particleSeeds.forEach((s, i) => {
-            const drift = expansion * 1.4;
+            const expansion = designPhase;
 
-            positions[i * 3] = s.x + Math.sin(p * s.speed + s.phase) * drift;
-            positions[i * 3 + 1] = s.y + Math.cos(p * s.speed + s.phase) * drift;
-            positions[i * 3 + 2] = s.z;
+            positions[i * 3] =
+                s.x * expansion;
+
+            positions[i * 3 + 1] =
+                s.y * expansion;
+
+            positions[i * 3 + 2] =
+                s.z * expansion;
         });
 
         particleGeometry.attributes.position.needsUpdate = true;
-
-        particleMaterial.opacity = lerp(0.5, 0.15, finalPhase);
     }
 
     // ==============================
