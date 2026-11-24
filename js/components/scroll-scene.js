@@ -1,450 +1,711 @@
 export function initScrollScene() {
-  const section = document.querySelector("#story");
-  const canvas = document.querySelector("#story-canvas");
-  const sticky = document.querySelector(".story-sticky");
+    const section = document.querySelector("#story");
+    const stage = section?.querySelector(".story-sticky");
+    const canvas = section?.querySelector("#story-canvas");
 
-  if (!section || !canvas || !sticky) return;
-
-  const ctx = canvas.getContext("2d", { alpha: false });
-  const progressBar = document.querySelector("#story-progress-bar");
-  const progressNumber = document.querySelector("#story-progress-number");
-  const caption = document.querySelector("#story-caption");
-
-  let width = 0;
-  let height = 0;
-  let dpr = 1;
-  let progress = 0;
-  let raf = 0;
-
-  const captions = [
-    {
-      at: 0.00,
-      index: "01 / IDEA",
-      title: "Everything<br>starts <em>small.</em>",
-      desc: "One thought. One shape. One possibility."
-    },
-    {
-      at: 0.12,
-      index: "02 / MOVEMENT",
-      title: "An idea<br>begins to <em>move.</em>",
-      desc: "Curiosity turns a thought into momentum."
-    },
-    {
-      at: 0.24,
-      index: "03 / CONNECTION",
-      title: "Everything<br>is <em>connected.</em>",
-      desc: "Different pieces find their place in one system."
-    },
-    {
-      at: 0.37,
-      index: "04 / CODE",
-      title: "A thought<br>becomes <em>code.</em>",
-      desc: "Abstract ideas become logic, structure, and possibility."
-    },
-    {
-      at: 0.51,
-      index: "05 / STRUCTURE",
-      title: "Structure<br>creates <em>meaning.</em>",
-      desc: "The invisible foundation starts taking shape."
-    },
-    {
-      at: 0.65,
-      index: "06 / CREATION",
-      title: "Something new<br>is <em>taking shape.</em>",
-      desc: "The pieces evolve into something that can be experienced."
-    },
-    {
-      at: 0.78,
-      index: "07 / EXPERIENCE",
-      title: "From concept<br>to <em>experience.</em>",
-      desc: "An idea becomes more than just an idea."
-    },
-    {
-      at: 0.91,
-      index: "08 / MARST",
-      title: "Keep<br><em>creating.</em>",
-      desc: "There is always another idea waiting to become real."
-    }
-  ];
-
-  function clamp(v, min = 0, max = 1) {
-    return Math.max(min, Math.min(max, v));
-  }
-
-  function lerp(a, b, t) {
-    return a + (b - a) * t;
-  }
-
-  function ease(t) {
-    t = clamp(t);
-    return t * t * (3 - 2 * t);
-  }
-
-  function segment(value, start, end) {
-    return ease((value - start) / (end - start));
-  }
-
-  function resize() {
-    const rect = sticky.getBoundingClientRect();
-
-    width = rect.width;
-    height = rect.height;
-    dpr = Math.min(window.devicePixelRatio || 1, 1.8);
-
-    canvas.width = Math.round(width * dpr);
-    canvas.height = Math.round(height * dpr);
-    canvas.style.width = `${width}px`;
-    canvas.style.height = `${height}px`;
-
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    draw(progress);
-  }
-
-  function getProgress() {
-    const rect = section.getBoundingClientRect();
-    const scrollLength = section.offsetHeight - window.innerHeight;
-
-    if (scrollLength <= 0) return 0;
-
-    return clamp(-rect.top / scrollLength);
-  }
-
-  function getCaptionIndex(p) {
-    let index = 0;
-
-    for (let i = 0; i < captions.length; i++) {
-      if (p >= captions[i].at) index = i;
+    if (!section || !stage || !canvas) {
+        console.warn("[MARST SCENE] 요소를 찾지 못했습니다.");
+        return;
     }
 
-    return index;
-  }
+    const ctx = canvas.getContext("2d", {
+        alpha: false
+    });
 
-  function updateCaption(p) {
-    const index = getCaptionIndex(p);
-    const data = captions[index];
+    if (!ctx) return;
 
-    if (caption.dataset.current === String(index)) return;
-    caption.dataset.current = String(index);
+    // 중복 초기화 방지
+    if (section.dataset.sceneInitialized === "true") return;
+    section.dataset.sceneInitialized = "true";
 
-    caption.classList.add("caption-changing");
+    const progressBar = document.querySelector("#story-progress-bar");
+    const progressNumber = document.querySelector("#story-progress-number");
+    const caption = document.querySelector("#story-caption");
 
-    window.setTimeout(() => {
-      const current = captions[getCaptionIndex(progress)];
+    const isMobile = () => window.innerWidth <= 768;
 
-      caption.innerHTML = `
-        <span class="story-caption-index">${current.index}</span>
-        <h2>${current.title}</h2>
-        <p>${current.desc}</p>
-      `;
+    let width = 0;
+    let height = 0;
+    let dpr = 1;
 
-      caption.classList.remove("caption-changing");
-    }, 180);
-  }
+    let scrollProgress = 0;
+    let currentMode = "before";
 
-  // Continuous connected path
-  function drawContinuousShape(p, cx, cy, baseSize) {
-    const ctx = ctxRef;
-  }
+    let rafId = 0;
+    let resizeObserver = null;
 
-  // Canvas drawing context
-  const ctxRef = ctx;
+    const captions = [
+        {
+            point: 0,
+            index: "01 / IDEA",
+            title: "Everything<br>starts <em>small.</em>",
+            description: "One thought. One shape. One possibility."
+        },
+        {
+            point: 0.12,
+            index: "02 / FORM",
+            title: "A thought<br>takes <em>shape.</em>",
+            description: "Ideas begin to gain structure and direction."
+        },
+            {
+            point: 0.25,
+            index: "03 / DESIGN",
+            title: "Shape becomes<br><em>meaning.</em>",
+            description: "The abstract becomes something people can see."
+        },
+        {
+            point: 0.38,
+            index: "04 / SYSTEM",
+            title: "Every part<br>has a <em>purpose.</em>",
+            description: "Separate elements connect to create something bigger."
+        },
+        {
+            point: 0.52,
+            index: "05 / CODE",
+            title: "Ideas become<br><em>reality.</em>",
+            description: "Logic turns imagination into something that works."
+        },
+        {
+            point: 0.66,
+            index: "06 / WEB",
+            title: "Something you<br>can <em>experience.</em>",
+            description: "A system becomes a product, a page, an experience."
+        },
+        {
+            point: 0.8,
+            index: "07 / CONNECT",
+            title: "Everything<br>connects <em>together.</em>",
+            description: "Design. Technology. Ideas. One continuous process."
+        },
+        {
+            point: 0.93,
+            index: "08 / MARST",
+            title: "Ideas don't<br>stay <em>ideas.</em>",
+            description: "I turn what I imagine into something real."
+        }
+    ];
 
-  function drawGrid(p) {
-    const gridSize = 48;
-    const shift = p * 24;
+    let activeCaption = -1;
 
-    ctx.save();
-    ctx.strokeStyle = "rgba(255,255,255,0.035)";
-    ctx.lineWidth = 1;
+    // ----------------------------------------
+    // 캔버스 크기
+    // ----------------------------------------
 
-    for (let x = (width % gridSize) / 2; x < width; x += gridSize) {
-      ctx.beginPath();
-      ctx.moveTo(x, 0);
-      ctx.lineTo(x, height);
-      ctx.stroke();
+    function resizeCanvas() {
+        width = stage.clientWidth || window.innerWidth;
+        height = stage.clientHeight || window.innerHeight;
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+        canvas.width = Math.floor(width * dpr);
+        canvas.height = Math.floor(height * dpr);
+
+        canvas.style.width = width + "px";
+        canvas.style.height = height + "px";
+
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+        draw(scrollProgress);
     }
 
-    for (let y = (height % gridSize) / 2 - shift; y < height; y += gridSize) {
-      ctx.beginPath();
-      ctx.moveTo(0, y);
-      ctx.lineTo(width, y);
-      ctx.stroke();
+    // ----------------------------------------
+    // Utils
+    // ----------------------------------------
+
+    function clamp(value, min = 0, max = 1) {
+        return Math.max(min, Math.min(max, value));
     }
 
-    ctx.restore();
-  }
-
-  function drawGlow(cx, cy, radius, alpha) {
-    const gradient = ctx.createRadialGradient(
-      cx, cy, 0,
-      cx, cy, radius
-    );
-
-    gradient.addColorStop(0, `rgba(205,255,105,${alpha})`);
-    gradient.addColorStop(0.35, `rgba(155,220,80,${alpha * 0.35})`);
-    gradient.addColorStop(1, "rgba(100,150,50,0)");
-
-    ctx.fillStyle = gradient;
-    ctx.beginPath();
-    ctx.arc(cx, cy, radius, 0, Math.PI * 2);
-    ctx.fill();
-  }
-
-  // Square transforms into one continuously connected illustration.
-  function drawMorph(p) {
-    const cx = width * 0.5;
-    const cy = height * 0.5;
-
-    const startSize = Math.min(width, height) * 0.075;
-    const finalSize = Math.min(width, height) * 0.36;
-
-    const expand = segment(p, 0.02, 0.28);
-    const expand2 = segment(p, 0.28, 0.58);
-    const expand3 = segment(p, 0.58, 0.86);
-
-    const size = lerp(startSize, finalSize, expand);
-    const finalScale = lerp(1, 1.28, expand3);
-
-    const moveX =
-      Math.sin(p * Math.PI * 2) * width * 0.12 * segment(p, 0.08, 0.5);
-
-    const moveY =
-      Math.cos(p * Math.PI * 2.2) * height * 0.09 * segment(p, 0.15, 0.65);
-
-    const x = cx + moveX;
-    const y = cy + moveY;
-
-    const rotation = lerp(0, Math.PI * 2.4, segment(p, 0.08, 0.62));
-    const corner = lerp(0, size * 0.48, segment(p, 0.15, 0.4));
-
-    // One shape, evolving from square into a connected visual form.
-    const points = 120;
-    const radius = size * finalScale;
-
-    const squareAmount = 1 - segment(p, 0.2, 0.48);
-    const organicAmount = segment(p, 0.32, 0.72);
-    const spreadAmount = segment(p, 0.58, 0.92);
-
-    drawGlow(x, y, radius * 3.2, 0.12 + spreadAmount * 0.1);
-
-    ctx.save();
-    ctx.translate(x, y);
-    ctx.rotate(rotation);
-
-    // Shape outline
-    ctx.beginPath();
-
-    for (let i = 0; i <= points; i++) {
-      const a = (i / points) * Math.PI * 2;
-      const nx = Math.cos(a);
-      const ny = Math.sin(a);
-
-      // Square-to-circle morph
-      const squareRadius = radius / Math.max(
-        Math.abs(nx),
-        Math.abs(ny),
-        0.001
-      );
-
-      const circularRadius = radius;
-      let r = lerp(squareRadius, circularRadius, organicAmount);
-
-      // Organic waveform changes the original contour
-      const wave =
-        Math.sin(a * 3 + p * 7) * 0.12 +
-        Math.cos(a * 5 - p * 5) * 0.06 +
-        Math.sin(a * 8 + p * 9) * 0.025;
-
-      r *= 1 + wave * organicAmount;
-      r += Math.sin(a * 2 + p * 4) * radius * 0.15 * spreadAmount;
-
-      const px = nx * r;
-      const py = ny * r;
-
-      if (i === 0) ctx.moveTo(px, py);
-      else ctx.lineTo(px, py);
+    function lerp(a, b, t) {
+        return a + (b - a) * t;
     }
 
-    ctx.closePath();
-
-    ctx.strokeStyle = `rgba(220,255,150,${0.7 + organicAmount * 0.3})`;
-    ctx.lineWidth = lerp(2.5, 1, organicAmount);
-    ctx.stroke();
-
-    // Inner connected lines
-    const lineProgress = segment(p, 0.12, 0.82);
-
-    ctx.save();
-    ctx.clip();
-
-    ctx.strokeStyle = `rgba(220,255,150,${0.15 + lineProgress * 0.24})`;
-    ctx.lineWidth = 1;
-
-    const innerLines = 24;
-
-    for (let i = 0; i < innerLines; i++) {
-      const t = i / innerLines;
-      const a = t * Math.PI * 2;
-
-      const startR = radius * 0.1;
-      const endR = radius * (0.45 + 0.55 * lineProgress);
-
-      const startX = Math.cos(a + p * 2) * startR;
-      const startY = Math.sin(a + p * 2) * startR;
-
-      const endX = Math.cos(a + p * 3) * endR;
-      const endY = Math.sin(a + p * 3) * endR;
-
-      ctx.beginPath();
-      ctx.moveTo(startX, startY);
-      ctx.lineTo(
-        lerp(startX, endX, lineProgress),
-        lerp(startY, endY, lineProgress)
-      );
-      ctx.stroke();
+    function ease(value) {
+        value = clamp(value);
+        return value * value * (3 - 2 * value);
     }
 
-    // Connected web-like network emerging from the original shape.
-    const networkProgress = segment(p, 0.38, 0.88);
-    const nodeCount = 34;
-
-    ctx.strokeStyle = `rgba(210,255,140,${0.12 * networkProgress})`;
-
-    for (let i = 0; i < nodeCount; i++) {
-      const a = (i / nodeCount) * Math.PI * 2;
-
-      const inner = radius * 0.3;
-      const outer = radius * (1.1 + networkProgress * 1.15);
-
-      const ax = Math.cos(a + p) * inner;
-      const ay = Math.sin(a + p) * inner;
-
-      const bx = Math.cos(a * 1.7 + p * 2) * outer;
-      const by = Math.sin(a * 1.7 + p * 2) * outer;
-
-      const reach = segment(p, 0.4 + i * 0.002, 0.85);
-
-      ctx.beginPath();
-      ctx.moveTo(ax, ay);
-      ctx.lineTo(lerp(ax, bx, reach), lerp(ay, by, reach));
-      ctx.stroke();
+    function segment(progress, start, end) {
+        return ease(clamp((progress - start) / (end - start)));
     }
 
-    // The same path gradually becomes a connected rectangular interface.
-    const interfaceProgress = segment(p, 0.46, 0.76);
-    const rectWidth = radius * 2.7 * interfaceProgress;
-    const rectHeight = radius * 1.9 * interfaceProgress;
-
-    ctx.strokeStyle = `rgba(220,255,150,${interfaceProgress * 0.32})`;
-    ctx.lineWidth = 1;
-
-    ctx.beginPath();
-    ctx.rect(
-      -rectWidth / 2,
-      -rectHeight / 2,
-      rectWidth,
-      rectHeight
-    );
-    ctx.stroke();
-
-    // Continuous UI lines - drawn inside the expanding composition.
-    for (let i = 0; i < 8; i++) {
-      const lineY = -rectHeight / 2 + (rectHeight / 8) * i;
-      const lineWidth = rectWidth * (0.2 + ((i * 7) % 5) * 0.12);
-
-      ctx.beginPath();
-      ctx.moveTo(-rectWidth / 2, lineY);
-      ctx.lineTo(
-        -rectWidth / 2 + lineWidth * interfaceProgress,
-        lineY
-      );
-      ctx.stroke();
+    function smoothstep(a, b, x) {
+        const t = clamp((x - a) / (b - a));
+        return t * t * (3 - 2 * t);
     }
 
-    // Gradually reveal code-like strokes, as part of the same image.
-    const codeProgress = segment(p, 0.34, 0.7);
+    // ----------------------------------------
+    // Scroll Pin System
+    // ----------------------------------------
 
-    ctx.strokeStyle = `rgba(220,255,150,${codeProgress * 0.55})`;
+    function getScrollMetrics() {
+        const rect = section.getBoundingClientRect();
+        const absoluteTop = window.scrollY + rect.top;
+        const sectionHeight = section.offsetHeight;
+        const viewportHeight = window.innerHeight;
 
-    for (let i = 0; i < 12; i++) {
-      const lineY = radius * 0.65 + i * radius * 0.095;
-      const lineWidth = radius * (0.5 + ((i * 3) % 6) * 0.12);
+        const start = absoluteTop;
+        const end = absoluteTop + sectionHeight - viewportHeight;
 
-      ctx.beginPath();
-      ctx.moveTo(-radius * 0.7, lineY);
-      ctx.lineTo(
-        -radius * 0.7 + lineWidth * codeProgress,
-        lineY
-      );
-      ctx.stroke();
+        return {
+            start,
+            end,
+            sectionHeight,
+            viewportHeight
+        };
     }
 
-    ctx.restore();
+    function pinStage() {
+        if (stage.parentElement !== document.body) {
+            document.body.appendChild(stage);
+        }
 
-    // The original square's center remains the source of the entire drawing.
-    ctx.beginPath();
-    ctx.arc(0, 0, radius * 0.055, 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(225,255,170,${1 - squareAmount * 0.4})`;
-    ctx.fill();
+        stage.classList.add("story-pinned");
+        stage.classList.remove("story-ended");
 
-    ctx.restore();
-  }
+        stage.style.position = "fixed";
+        stage.style.top = "0";
+        stage.style.left = "0";
+        stage.style.right = "0";
+        stage.style.bottom = "auto";
+        stage.style.width = "100vw";
+        stage.style.height = "100vh";
+        stage.style.zIndex = "99999";
 
-  function draw(p) {
-    if (!width || !height) return;
+        currentMode = "pinned";
 
-    ctx.fillStyle = "#080908";
-    ctx.fillRect(0, 0, width, height);
-
-    drawGrid(p);
-    drawMorph(p);
-
-    // Edge shading
-    const vignette = ctx.createRadialGradient(
-      width * 0.5,
-      height * 0.5,
-      height * 0.12,
-      width * 0.5,
-      height * 0.5,
-      height * 0.85
-    );
-
-    vignette.addColorStop(0, "rgba(0,0,0,0)");
-    vignette.addColorStop(1, "rgba(0,0,0,0.58)");
-
-    ctx.fillStyle = vignette;
-    ctx.fillRect(0, 0, width, height);
-  }
-
-  function update() {
-    raf = 0;
-    progress = getProgress();
-
-    draw(progress);
-
-    if (progressBar) {
-      progressBar.style.transform = `scaleX(${progress})`;
+        resizeCanvas();
     }
 
-    if (progressNumber) {
-      progressNumber.textContent = String(Math.round(progress * 100))
-        .padStart(3, "0");
+    function unpinStage() {
+        if (stage.parentElement !== section) {
+            section.appendChild(stage);
+        }
+
+        stage.classList.remove("story-pinned");
+        stage.classList.remove("story-ended");
+
+        stage.style.position = "absolute";
+        stage.style.top = "0";
+        stage.style.left = "0";
+        stage.style.right = "0";
+        stage.style.bottom = "auto";
+        stage.style.width = "100%";
+        stage.style.height = "100vh";
+        stage.style.zIndex = "10";
+
+        currentMode = "before";
+
+        resizeCanvas();
     }
 
-    updateCaption(progress);
-  }
+    function endStage() {
+        if (stage.parentElement !== section) {
+            section.appendChild(stage);
+        }
 
-  function requestUpdate() {
-    if (raf) return;
-    raf = requestAnimationFrame(update);
-  }
+        stage.classList.remove("story-pinned");
+        stage.classList.add("story-ended");
 
-  const resizeObserver = new ResizeObserver(resize);
-  resizeObserver.observe(sticky);
+        stage.style.position = "absolute";
+        stage.style.top = "auto";
+        stage.style.left = "0";
+        stage.style.right = "0";
+        stage.style.bottom = "0";
+        stage.style.width = "100%";
+        stage.style.height = "100vh";
+        stage.style.zIndex = "10";
 
-  window.addEventListener("scroll", requestUpdate, { passive: true });
-  window.addEventListener("resize", resize, { passive: true });
+        currentMode = "after";
 
-  resize();
-  requestUpdate();
+        resizeCanvas();
+    }
+
+    function updatePin() {
+        const metrics = getScrollMetrics();
+        const scrollY = window.scrollY;
+
+        if (scrollY < metrics.start) {
+            if (currentMode !== "before") {
+                unpinStage();
+            }
+
+            scrollProgress = 0;
+            return;
+        }
+
+        if (scrollY >= metrics.end) {
+            if (currentMode !== "after") {
+                endStage();
+            }
+
+            scrollProgress = 1;
+            return;
+        }
+
+        if (currentMode !== "pinned") {
+            pinStage();
+        }
+
+        scrollProgress = clamp(
+            (scrollY - metrics.start) /
+            Math.max(1, metrics.end - metrics.start)
+        );
+    }
+
+    // ----------------------------------------
+    // Caption
+    // ----------------------------------------
+
+    function updateCaption(progress) {
+        let targetIndex = 0;
+
+        for (let i = 0; i < captions.length; i++) {
+            if (progress >= captions[i].point) {
+                targetIndex = i;
+            }
+        }
+
+        if (targetIndex === activeCaption) return;
+
+        activeCaption = targetIndex;
+
+        const item = captions[targetIndex];
+
+        if (!caption) return;
+
+        caption.style.opacity = "0";
+        caption.style.transform = "translateY(12px)";
+
+        requestAnimationFrame(() => {
+            const indexEl = caption.querySelector(".story-caption-index");
+            const titleEl = caption.querySelector("h2");
+            const descriptionEl = caption.querySelector("p");
+
+            if (indexEl) indexEl.innerHTML = item.index;
+            if (titleEl) titleEl.innerHTML = item.title;
+            if (descriptionEl) descriptionEl.textContent = item.description;
+
+            requestAnimationFrame(() => {
+                caption.style.opacity = "1";
+                caption.style.transform = "translateY(0)";
+            });
+        });
+    }
+
+    // ----------------------------------------
+    // Drawing
+    // ----------------------------------------
+
+    function clear() {
+        ctx.fillStyle = "#080908";
+        ctx.fillRect(0, 0, width, height);
+    }
+
+    function drawGrid(progress) {
+        const spacing = isMobile() ? 32 : 48;
+
+        const fade = 1 - smoothstep(0.5, 0.9, progress);
+
+        ctx.strokeStyle = `rgba(255,255,255,${0.035 * fade})`;
+        ctx.lineWidth = 1;
+
+        for (let x = 0; x < width; x += spacing) {
+            ctx.beginPath();
+            ctx.moveTo(x, 0);
+            ctx.lineTo(x, height);
+            ctx.stroke();
+        }
+
+        for (let y = 0; y < height; y += spacing) {
+            ctx.beginPath();
+            ctx.moveTo(0, y);
+            ctx.lineTo(width, y);
+            ctx.stroke();
+        }
+    }
+
+    function drawGlow(cx, cy, radius, opacity) {
+        const gradient = ctx.createRadialGradient(
+            cx, cy, 0,
+            cx, cy, radius
+        );
+
+        gradient.addColorStop(0, `rgba(223,255,114,${opacity})`);
+        gradient.addColorStop(0.4, `rgba(150,180,70,${opacity * 0.3})`);
+        gradient.addColorStop(1, "rgba(8,9,8,0)");
+
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, width, height);
+    }
+
+    function drawSquare(progress, cx, cy, size) {
+        const rotation = progress * Math.PI * 2.5;
+
+        const corner = lerp(0, size * 0.48, segment(0.1, 0.42, progress));
+        const stretchX = lerp(1, 2.8, segment(0.3, 0.6, progress));
+        const stretchY = lerp(1, 0.48, segment(0.3, 0.6, progress));
+
+        ctx.save();
+
+        ctx.translate(cx, cy);
+        ctx.rotate(rotation);
+        ctx.scale(stretchX, stretchY);
+
+        ctx.beginPath();
+
+        const half = size / 2;
+
+        ctx.moveTo(-half + corner, -half);
+        ctx.lineTo(half - corner, -half);
+        ctx.quadraticCurveTo(half, -half, half, -half + corner);
+
+        ctx.lineTo(half, half - corner);
+        ctx.quadraticCurveTo(half, half, half - corner, half);
+
+        ctx.lineTo(-half + corner, half);
+        ctx.quadraticCurveTo(-half, half, -half, half - corner);
+
+        ctx.lineTo(-half, -half + corner);
+        ctx.quadraticCurveTo(-half, -half, -half + corner, -half);
+
+        ctx.closePath();
+
+        const fade = 1 - segment(0.72, 0.96, progress);
+
+        ctx.strokeStyle = `rgba(223,255,114,${fade})`;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        ctx.fillStyle = `rgba(223,255,114,${0.025 * fade})`;
+        ctx.fill();
+
+        ctx.restore();
+    }
+
+    function drawNetwork(progress, cx, cy, size) {
+        const spread = lerp(size * 0.5, width * 0.48, segment(0.15, 0.6, progress));
+        const count = 24;
+
+        const nodes = [];
+
+        for (let i = 0; i < count; i++) {
+            const angle = (Math.PI * 2 / count) * i;
+            const drift = Math.sin(i * 3.1 + progress * 8) * 30;
+
+            const r = spread + drift;
+
+            nodes.push({
+                x: cx + Math.cos(angle) * r,
+                y: cy + Math.sin(angle) * r,
+                angle
+            });
+        }
+
+        const alpha = segment(0.18, 0.5, progress) *
+            (1 - segment(0.8, 1, progress));
+
+        ctx.lineWidth = 0.7;
+        ctx.strokeStyle = `rgba(223,255,114,${alpha * 0.25})`;
+
+        // 원형 네트워크
+        for (let i = 0; i < nodes.length; i++) {
+            const a = nodes[i];
+            const b = nodes[(i + 1) % nodes.length];
+
+            ctx.beginPath();
+            ctx.moveTo(a.x, a.y);
+            ctx.lineTo(b.x, b.y);
+            ctx.stroke();
+        }
+
+        // 내부 연결
+        for (let i = 0; i < nodes.length; i++) {
+            for (let j = i + 2; j < nodes.length; j += 4) {
+                const a = nodes[i];
+                const b = nodes[j];
+
+                ctx.strokeStyle = `rgba(223,255,114,${alpha * 0.1})`;
+
+                ctx.beginPath();
+                ctx.moveTo(a.x, a.y);
+                ctx.lineTo(b.x, b.y);
+                ctx.stroke();
+            }
+        }
+
+        // 노드
+        nodes.forEach((node, i) => {
+            const pulse = 1 + Math.sin(progress * 15 + i) * 0.5;
+
+            ctx.beginPath();
+            ctx.arc(node.x, node.y, 1.4 * pulse, 0, Math.PI * 2);
+
+            ctx.fillStyle = `rgba(223,255,114,${alpha * 0.6})`;
+            ctx.fill();
+        });
+    }
+
+    function drawOrbit(progress, cx, cy, size) {
+        const opacity = segment(0.35, 0.65, progress) *
+            (1 - segment(0.85, 1, progress));
+
+        const orbitSize = lerp(size, width * 0.45, progress);
+
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(progress * 1.3);
+
+        for (let i = 0; i < 3; i++) {
+            ctx.beginPath();
+            ctx.ellipse(
+                0, 0,
+                orbitSize * (1 + i * 0.13),
+                orbitSize * (0.42 + i * 0.1),
+                i * 0.7,
+                0,
+                Math.PI * 2
+            );
+
+            ctx.strokeStyle = `rgba(223,255,114,${opacity * 0.18})`;
+            ctx.lineWidth = 1;
+            ctx.stroke();
+        }
+
+        ctx.restore();
+    }
+
+    function drawCode(progress) {
+        const p = segment(0.45, 0.7, progress);
+        const fade = 1 - segment(0.86, 1, progress);
+
+        if (p <= 0) return;
+
+        const lines = [
+            "const idea = new Possibility();",
+            "idea.connect(design);",
+            "idea.connect(technology);",
+            "idea.build();",
+            "return reality;"
+        ];
+
+        const startX = width * 0.58;
+        const startY = height * 0.38;
+
+        ctx.save();
+
+        ctx.globalAlpha = p * fade * 0.6;
+
+        ctx.font = isMobile() ? "10px monospace" : "13px monospace";
+
+        lines.forEach((line, index) => {
+            const lineProgress = clamp(p * 1.4 - index * 0.14);
+
+            ctx.fillStyle = index === 4
+                ? "#dfff72"
+                : "rgba(255,255,255,.4)";
+
+            ctx.fillText(
+                line.substring(0, Math.floor(line.length * lineProgress)),
+                startX,
+                startY + index * 26
+            );
+        });
+
+        ctx.restore();
+    }
+
+    function drawInterface(progress) {
+        const p = segment(0.62, 0.82, progress);
+        const fade = 1 - segment(0.93, 1, progress);
+
+        if (p <= 0) return;
+
+        const panelWidth = Math.min(width * 0.58, 620);
+        const panelHeight = Math.min(height * 0.45, 360);
+
+        const x = width * 0.5 - panelWidth * 0.5;
+        const y = height * 0.5 - panelHeight * 0.5;
+
+        ctx.save();
+
+        ctx.globalAlpha = p * fade;
+
+        ctx.strokeStyle = "rgba(255,255,255,.12)";
+        ctx.lineWidth = 1;
+
+        ctx.strokeRect(x, y, panelWidth, panelHeight);
+
+        ctx.fillStyle = "#111411";
+        ctx.fillRect(x, y, panelWidth, panelHeight);
+
+        // UI Header
+        ctx.fillStyle = "#dfff72";
+        ctx.fillRect(x + 20, y + 20, 35, 3);
+
+        ctx.fillStyle = "rgba(255,255,255,.2)";
+        ctx.fillRect(x + 20, y + 36, panelWidth * 0.25, 2);
+
+        // UI Content
+        const rows = 4;
+
+        for (let i = 0; i < rows; i++) {
+            const rowY = y + 80 + i * 55;
+
+            ctx.fillStyle = "rgba(255,255,255,.04)";
+            ctx.fillRect(x + 20, rowY, panelWidth - 40, 38);
+
+            ctx.fillStyle = i === 0
+                ? "rgba(223,255,114,.7)"
+                : "rgba(255,255,255,.12)";
+
+            ctx.fillRect(
+                x + 35,
+                rowY + 12,
+                (panelWidth - 80) * (0.35 + i * 0.1),
+                3
+            );
+        }
+
+        ctx.restore();
+    }
+
+    function drawParticles(progress, cx, cy) {
+        const alpha = 1 - segment(0.8, 1, progress);
+        const count = 70;
+
+        for (let i = 0; i < count; i++) {
+            const seed = i * 127.1;
+
+            const x = (Math.sin(seed) * 0.5 + 0.5) * width;
+            const y = (Math.cos(seed * 0.73) * 0.5 + 0.5) * height;
+
+            const movement = Math.sin(progress * 10 + i) * 15;
+
+            ctx.beginPath();
+            ctx.arc(x + movement, y, 1, 0, Math.PI * 2);
+
+            ctx.fillStyle = `rgba(223,255,114,${alpha * 0.2})`;
+            ctx.fill();
+        }
+    }
+
+    function drawFinal(progress) {
+        const p = segment(0.84, 1, progress);
+
+        if (p <= 0) return;
+
+        const cx = width / 2;
+        const cy = height / 2;
+        const radius = lerp(20, Math.max(width, height) * 0.38, p);
+
+        ctx.save();
+
+        ctx.globalAlpha = p;
+
+        ctx.strokeStyle = "#dfff72";
+        ctx.lineWidth = 1.5;
+
+        ctx.beginPath();
+        ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+        ctx.stroke();
+
+        ctx.fillStyle = "rgba(223,255,114,.025)";
+        ctx.fill();
+
+        ctx.font = `bold ${isMobile() ? 38 : 70}px sans-serif`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+
+        ctx.fillStyle = "#f4f5ef";
+        ctx.fillText("MARST", cx, cy);
+
+        ctx.restore();
+    }
+
+    function draw(progress) {
+        if (!ctx || !width || !height) return;
+
+        clear();
+
+        const cx = width * (isMobile() ? 0.5 : 0.58);
+        const cy = height * 0.5;
+
+        const baseSize = Math.min(width, height) * 0.2;
+
+        drawGrid(progress);
+        drawGlow(cx, cy, Math.max(width, height) * 0.6, 0.09);
+        drawParticles(progress, cx, cy);
+        drawSquare(progress, cx, cy, baseSize);
+        drawNetwork(progress, cx, cy, baseSize);
+        drawOrbit(progress, cx, cy, baseSize);
+        drawCode(progress);
+        drawInterface(progress);
+        drawFinal(progress);
+
+        updateCaption(progress);
+
+        if (progressBar) {
+            progressBar.style.width = (progress * 100) + "%";
+        }
+
+        if (progressNumber) {
+            progressNumber.textContent =
+                String(Math.round(progress * 100)).padStart(3, "0");
+        }
+    }
+
+    // ----------------------------------------
+    // Scroll handler
+    // ----------------------------------------
+
+    function update() {
+        updatePin();
+        draw(scrollProgress);
+    }
+
+    function onScroll() {
+        if (rafId) return;
+
+        rafId = requestAnimationFrame(() => {
+            rafId = 0;
+            update();
+        });
+    }
+
+    function onResize() {
+        resizeCanvas();
+        update();
+    }
+
+    // ----------------------------------------
+    // Init
+    // ----------------------------------------
+
+    section.style.position = "relative";
+    section.style.overflow = "visible";
+
+    stage.classList.remove("story-pinned", "story-ended");
+
+    stage.style.position = "absolute";
+    stage.style.top = "0";
+    stage.style.left = "0";
+    stage.style.bottom = "auto";
+    stage.style.width = "100%";
+    stage.style.height = "100vh";
+
+    resizeCanvas();
+    update();
+
+    window.addEventListener("scroll", onScroll, {
+        passive: true
+    });
+
+    window.addEventListener("resize", onResize);
+
+    window.addEventListener("orientationchange", onResize);
+
+    resizeObserver = new ResizeObserver(onResize);
+    resizeObserver.observe(section);
+
+    console.log("[MARST SCENE] JS Pin System Ready");
 }
