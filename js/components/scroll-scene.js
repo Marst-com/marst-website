@@ -1,160 +1,427 @@
+import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js";
+
 export function initScrollScene() {
     const section = document.querySelector("#story");
     const stage = section?.querySelector(".story-sticky");
     const canvas = section?.querySelector("#story-canvas");
 
-    if (!section || !stage || !canvas) {
-        console.warn("[MARST SCENE] 요소를 찾지 못했습니다.");
-        return;
-    }
-
-    const ctx = canvas.getContext("2d", {
-        alpha: false
-    });
-
-    if (!ctx) return;
-
-    // 중복 초기화 방지
-    if (section.dataset.sceneInitialized === "true") return;
-    section.dataset.sceneInitialized = "true";
+    if (!section || !stage || !canvas || stage.dataset.initialized) return;
+    stage.dataset.initialized = "true";
 
     const progressBar = document.querySelector("#story-progress-bar");
     const progressNumber = document.querySelector("#story-progress-number");
     const caption = document.querySelector("#story-caption");
 
-    const isMobile = () => window.innerWidth <= 768;
-
-    let width = 0;
-    let height = 0;
-    let dpr = 1;
-
-    let scrollProgress = 0;
-    let currentMode = "before";
-
-    let rafId = 0;
-    let resizeObserver = null;
-
-    const captions = [
-        {
-            point: 0,
-            index: "01 / IDEA",
-            title: "Everything<br>starts <em>small.</em>",
-            description: "One thought. One shape. One possibility."
-        },
-        {
-            point: 0.12,
-            index: "02 / FORM",
-            title: "A thought<br>takes <em>shape.</em>",
-            description: "Ideas begin to gain structure and direction."
-        },
-            {
-            point: 0.25,
-            index: "03 / DESIGN",
-            title: "Shape becomes<br><em>meaning.</em>",
-            description: "The abstract becomes something people can see."
-        },
-        {
-            point: 0.38,
-            index: "04 / SYSTEM",
-            title: "Every part<br>has a <em>purpose.</em>",
-            description: "Separate elements connect to create something bigger."
-        },
-        {
-            point: 0.52,
-            index: "05 / CODE",
-            title: "Ideas become<br><em>reality.</em>",
-            description: "Logic turns imagination into something that works."
-        },
-        {
-            point: 0.66,
-            index: "06 / WEB",
-            title: "Something you<br>can <em>experience.</em>",
-            description: "A system becomes a product, a page, an experience."
-        },
-        {
-            point: 0.8,
-            index: "07 / CONNECT",
-            title: "Everything<br>connects <em>together.</em>",
-            description: "Design. Technology. Ideas. One continuous process."
-        },
-        {
-            point: 0.93,
-            index: "08 / MARST",
-            title: "Ideas don't<br>stay <em>ideas.</em>",
-            description: "I turn what I imagine into something real."
-        }
-    ];
-
-    let activeCaption = -1;
-
-    // ----------------------------------------
-    // 캔버스 크기
-    // ----------------------------------------
-
-    function resizeCanvas() {
-        width = stage.clientWidth || window.innerWidth;
-        height = stage.clientHeight || window.innerHeight;
-        dpr = Math.min(window.devicePixelRatio || 1, 2);
-
-        canvas.width = Math.floor(width * dpr);
-        canvas.height = Math.floor(height * dpr);
-
-        canvas.style.width = width + "px";
-        canvas.style.height = height + "px";
-
-        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-        draw(scrollProgress);
-    }
-
-    // ----------------------------------------
-    // Utils
-    // ----------------------------------------
-
-    function clamp(value, min = 0, max = 1) {
-        return Math.max(min, Math.min(max, value));
-    }
-
-    function lerp(a, b, t) {
-        return a + (b - a) * t;
-    }
-
-    function ease(value) {
-        value = clamp(value);
-        return value * value * (3 - 2 * value);
-    }
-
-    function segment(progress, start, end) {
-        return ease(clamp((progress - start) / (end - start)));
-    }
-
-    function smoothstep(a, b, x) {
+    const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+    const lerp = (a, b, t) => a + (b - a) * t;
+    const smooth = (a, b, x) => {
         const t = clamp((x - a) / (b - a));
         return t * t * (3 - 2 * t);
+    };
+
+    let progress = 0;
+    let currentMode = "before";
+    let frame = 0;
+    let activeCaption = -1;
+    let width = 1;
+    let height = 1;
+
+    // ==============================
+    // THREE.JS
+    // ==============================
+
+    const renderer = new THREE.WebGLRenderer({
+        canvas,
+        antialias: true,
+        alpha: false,
+        powerPreference: "high-performance"
+    });
+
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.15;
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color("#080908");
+    scene.fog = new THREE.FogExp2("#080908", 0.018);
+
+    const camera = new THREE.PerspectiveCamera(
+        38,
+        window.innerWidth / window.innerHeight,
+        0.1,
+        100
+    );
+
+    camera.position.set(0, 0, 13);
+
+    // ==============================
+    // LIGHTS
+    // ==============================
+
+    scene.add(new THREE.AmbientLight(0xffffff, 0.65));
+
+    const keyLight = new THREE.PointLight(0xdfff72, 90, 35);
+    keyLight.position.set(4, 5, 5);
+    scene.add(keyLight);
+
+    const whiteLight = new THREE.PointLight(0xffffff, 120, 30);
+    whiteLight.position.set(-5, 3, 6);
+    scene.add(whiteLight);
+
+    const rimLight = new THREE.PointLight(0x8ea4ff, 65, 30);
+    rimLight.position.set(0, -5, -5);
+    scene.add(rimLight);
+
+    // ==============================
+    // MATERIALS
+    // ==============================
+
+    const limeMetal = new THREE.MeshStandardMaterial({
+        color: 0xdfff72,
+        metalness: 0.8,
+        roughness: 0.24
+    });
+
+    const darkMetal = new THREE.MeshStandardMaterial({
+        color: 0x242824,
+        metalness: 0.86,
+        roughness: 0.3
+    });
+
+    const silver = new THREE.MeshStandardMaterial({
+        color: 0xb9c0bd,
+        metalness: 0.92,
+        roughness: 0.19
+    });
+
+    const blackGlass = new THREE.MeshPhysicalMaterial({
+        color: 0x101512,
+        metalness: 0.45,
+        roughness: 0.15,
+        transmission: 0.15,
+        thickness: 0.8,
+        transparent: true,
+        opacity: 0.94
+    });
+
+    const glass = new THREE.MeshPhysicalMaterial({
+        color: 0xc9e0cf,
+        metalness: 0.1,
+        roughness: 0.1,
+        transmission: 0.7,
+        thickness: 0.5,
+        transparent: true,
+        opacity: 0.65
+    });
+
+    const glowMaterial = new THREE.MeshBasicMaterial({
+        color: 0xdfff72
+    });
+
+    // ==============================
+    // WORLD
+    // ==============================
+
+    const world = new THREE.Group();
+    scene.add(world);
+
+    const mainObject = new THREE.Group();
+    world.add(mainObject);
+
+    const cubeGeometry = new THREE.BoxGeometry(1.15, 1.15, 1.15);
+
+    const mainCube = new THREE.Mesh(cubeGeometry, limeMetal);
+    mainObject.add(mainCube);
+
+    const innerCube = new THREE.Mesh(
+        new THREE.BoxGeometry(0.72, 0.72, 0.72),
+        darkMetal
+    );
+    mainObject.add(innerCube);
+
+    const cubeWire = new THREE.LineSegments(
+        new THREE.EdgesGeometry(new THREE.BoxGeometry(1.42, 1.42, 1.42)),
+        new THREE.LineBasicMaterial({
+            color: 0xdfff72,
+            transparent: true,
+            opacity: 0.5
+        })
+    );
+    mainObject.add(cubeWire);
+
+    // 작은 중심 큐브
+    const core = new THREE.Mesh(
+        new THREE.BoxGeometry(0.25, 0.25, 0.25),
+        glowMaterial
+    );
+    mainObject.add(core);
+
+    // ==============================
+    // MULTI ELEMENTS
+    // ==============================
+
+    const modules = [];
+
+    const geometries = [
+        new THREE.BoxGeometry(0.7, 0.7, 0.7),
+        new THREE.BoxGeometry(0.45, 0.45, 0.45),
+        new THREE.BoxGeometry(1.1, 0.12, 0.75),
+        new THREE.BoxGeometry(0.12, 1.0, 0.65),
+        new THREE.BoxGeometry(0.8, 0.08, 0.8),
+        new THREE.BoxGeometry(0.28, 0.28, 0.28)
+    ];
+
+    const materials = [
+        limeMetal,
+        darkMetal,
+        silver,
+        blackGlass,
+        glass
+    ];
+
+    // Deterministic pseudo-random
+    let seed = 9382;
+    function random() {
+        seed = (seed * 16807) % 2147483647;
+        return (seed - 1) / 2147483646;
     }
 
-    // ----------------------------------------
-    // Scroll Pin System
-    // ----------------------------------------
+    for (let i = 0; i < 72; i++) {
+        const group = new THREE.Group();
 
-    function getScrollMetrics() {
-        const rect = section.getBoundingClientRect();
-        const absoluteTop = window.scrollY + rect.top;
-        const sectionHeight = section.offsetHeight;
-        const viewportHeight = window.innerHeight;
+        const geometry = geometries[Math.floor(random() * geometries.length)];
+        const material = materials[Math.floor(random() * materials.length)];
 
-        const start = absoluteTop;
-        const end = absoluteTop + sectionHeight - viewportHeight;
+        const mesh = new THREE.Mesh(geometry, material);
 
-        return {
+        mesh.castShadow = false;
+        mesh.receiveShadow = false;
+
+        group.add(mesh);
+
+        // Some pieces have wireframes
+        if (i % 4 === 0) {
+            const edges = new THREE.LineSegments(
+                new THREE.EdgesGeometry(geometry),
+                new THREE.LineBasicMaterial({
+                    color: i % 8 === 0 ? 0xdfff72 : 0xffffff,
+                    transparent: true,
+                    opacity: 0.25
+                })
+            );
+            group.add(edges);
+        }
+
+        // Starting position: around the core
+        const startRadius = 0.8 + random() * 1.4;
+
+        const angle = random() * Math.PI * 2;
+        const vertical = (random() - 0.5) * 2.8;
+
+        const start = new THREE.Vector3(
+            Math.cos(angle) * startRadius,
+            vertical,
+            Math.sin(angle) * startRadius
+        );
+
+        // Expanded position: huge geometric architecture
+        const end = new THREE.Vector3(
+            (random() - 0.5) * 12,
+            (random() - 0.5) * 7,
+            (random() - 0.5) * 6
+        );
+
+        // Service/interface formation
+        const service = new THREE.Vector3(
+            (i % 12 - 5.5) * 0.72,
+            (Math.floor(i / 12) - 2) * 0.8,
+            (random() - 0.5) * 0.7
+        );
+
+        const scaleStart = 0.15 + random() * 0.55;
+        const scaleEnd = 0.65 + random() * 1.2;
+
+        group.position.copy(start);
+        group.scale.setScalar(scaleStart);
+
+        group.rotation.set(
+            random() * Math.PI,
+            random() * Math.PI,
+            random() * Math.PI
+        );
+
+        world.add(group);
+
+        modules.push({
+            group,
             start,
             end,
-            sectionHeight,
-            viewportHeight
+            service,
+            startRotation: group.rotation.clone(),
+            endRotation: new THREE.Euler(
+                random() * Math.PI * 2,
+                random() * Math.PI * 2,
+                random() * Math.PI * 2
+            ),
+            scaleStart,
+            scaleEnd,
+            phase: random() * Math.PI * 2,
+            speed: 0.5 + random() * 1.5
+        });
+    }
+
+    // ==============================
+    // FLOATING PLATES
+    // ==============================
+
+    const plates = [];
+
+    for (let i = 0; i < 16; i++) {
+        const geo = new THREE.BoxGeometry(
+            1.2 + random() * 2,
+            0.035,
+            1.2 + random() * 2
+        );
+
+        const plate = new THREE.Mesh(
+            geo,
+            i % 3 === 0 ? silver : darkMetal
+        );
+
+        const start = new THREE.Vector3(
+            (random() - 0.5) * 3,
+            (random() - 0.5) * 3,
+            (random() - 0.5) * 3
+        );
+
+        const end = new THREE.Vector3(
+            (random() - 0.5) * 15,
+            (random() - 0.5) * 9,
+            -2 - random() * 3
+        );
+
+        plate.position.copy(start);
+        plate.rotation.set(random(), random(), random());
+
+        world.add(plate);
+
+        plates.push({
+            mesh: plate,
+            start,
+            end,
+            phase: random() * Math.PI * 2
+        });
+    }
+
+    // ==============================
+    // PARTICLES
+    // ==============================
+
+    const particleCount = 500;
+
+    const particlePositions = new Float32Array(particleCount * 3);
+    const particleSeeds = [];
+
+    for (let i = 0; i < particleCount; i++) {
+        const x = (random() - 0.5) * 22;
+        const y = (random() - 0.5) * 13;
+        const z = (random() - 0.5) * 15;
+
+        particlePositions[i * 3] = x;
+        particlePositions[i * 3 + 1] = y;
+        particlePositions[i * 3 + 2] = z;
+
+        particleSeeds.push({
+            x,
+            y,
+            z,
+            phase: random() * Math.PI * 2,
+            speed: 0.3 + random() * 1.4
+        });
+    }
+
+    const particleGeometry = new THREE.BufferGeometry();
+    particleGeometry.setAttribute(
+        "position",
+        new THREE.BufferAttribute(particlePositions, 3)
+    );
+
+    const particleMaterial = new THREE.PointsMaterial({
+        color: 0xdfff72,
+        size: 0.025,
+        transparent: true,
+        opacity: 0.5,
+        depthWrite: false
+    });
+
+    const particles = new THREE.Points(
+        particleGeometry,
+        particleMaterial
+    );
+
+    scene.add(particles);
+
+    // ==============================
+    // RINGS
+    // ==============================
+
+    const rings = [];
+
+    for (let i = 0; i < 8; i++) {
+        const ring = new THREE.Mesh(
+            new THREE.TorusGeometry(1.5 + i * 0.35, 0.008, 8, 160),
+            new THREE.MeshBasicMaterial({
+                color: i % 2 ? 0x85945c : 0xdfff72,
+                transparent: true,
+                opacity: 0.22
+            })
+        );
+
+        ring.rotation.x = Math.PI / 2 + random();
+        ring.rotation.y = random() * Math.PI;
+
+        world.add(ring);
+
+        rings.push({
+            mesh: ring,
+            initialScale: 0.6 + random() * 0.6
+        });
+    }
+
+    // ==============================
+    // FLOOR
+    // ==============================
+
+    const floor = new THREE.Mesh(
+        new THREE.PlaneGeometry(200, 200),
+        new THREE.MeshStandardMaterial({
+            color: 0x080908,
+            metalness: 0.3,
+            roughness: 0.7
+        })
+    );
+
+    floor.rotation.x = -Math.PI / 2;
+    floor.position.y = -5;
+    scene.add(floor);
+
+    // ==============================
+    // SCROLL PIN
+    // ==============================
+
+    function getMetrics() {
+        const rect = section.getBoundingClientRect();
+        const top = window.scrollY + rect.top;
+
+        return {
+            start: top,
+            end: top + section.offsetHeight - window.innerHeight
         };
     }
 
-    function pinStage() {
+    function pin() {
         if (stage.parentElement !== document.body) {
             document.body.appendChild(stage);
         }
@@ -165,40 +432,35 @@ export function initScrollScene() {
         stage.style.position = "fixed";
         stage.style.top = "0";
         stage.style.left = "0";
-        stage.style.right = "0";
         stage.style.bottom = "auto";
+        stage.style.right = "0";
         stage.style.width = "100vw";
         stage.style.height = "100vh";
         stage.style.zIndex = "99999";
 
         currentMode = "pinned";
-
-        resizeCanvas();
     }
 
-    function unpinStage() {
+    function unpin() {
         if (stage.parentElement !== section) {
             section.appendChild(stage);
         }
 
-        stage.classList.remove("story-pinned");
-        stage.classList.remove("story-ended");
+        stage.classList.remove("story-pinned", "story-ended");
 
         stage.style.position = "absolute";
         stage.style.top = "0";
         stage.style.left = "0";
-        stage.style.right = "0";
         stage.style.bottom = "auto";
+        stage.style.right = "auto";
         stage.style.width = "100%";
         stage.style.height = "100vh";
         stage.style.zIndex = "10";
 
         currentMode = "before";
-
-        resizeCanvas();
     }
 
-    function endStage() {
+    function finishPin() {
         if (stage.parentElement !== section) {
             section.appendChild(stage);
         }
@@ -208,484 +470,299 @@ export function initScrollScene() {
 
         stage.style.position = "absolute";
         stage.style.top = "auto";
-        stage.style.left = "0";
-        stage.style.right = "0";
         stage.style.bottom = "0";
+        stage.style.left = "0";
+        stage.style.right = "auto";
         stage.style.width = "100%";
         stage.style.height = "100vh";
         stage.style.zIndex = "10";
 
         currentMode = "after";
-
-        resizeCanvas();
     }
 
     function updatePin() {
-        const metrics = getScrollMetrics();
-        const scrollY = window.scrollY;
+        const m = getMetrics();
+        const y = window.scrollY;
 
-        if (scrollY < metrics.start) {
-            if (currentMode !== "before") {
-                unpinStage();
-            }
-
-            scrollProgress = 0;
+        if (y < m.start) {
+            if (currentMode !== "before") unpin();
+            progress = 0;
             return;
         }
 
-        if (scrollY >= metrics.end) {
-            if (currentMode !== "after") {
-                endStage();
-            }
-
-            scrollProgress = 1;
+        if (y >= m.end) {
+            if (currentMode !== "after") finishPin();
+            progress = 1;
             return;
         }
 
-        if (currentMode !== "pinned") {
-            pinStage();
-        }
+        if (currentMode !== "pinned") pin();
 
-        scrollProgress = clamp(
-            (scrollY - metrics.start) /
-            Math.max(1, metrics.end - metrics.start)
-        );
+        progress = clamp((y - m.start) / Math.max(1, m.end - m.start));
     }
 
-    // ----------------------------------------
-    // Caption
-    // ----------------------------------------
+    // ==============================
+    // STORY TEXT
+    // ==============================
 
-    function updateCaption(progress) {
-        let targetIndex = 0;
+    const captions = [
+        [0.00, "01 / IDEA", "Everything<br>starts <em>small.</em>", "One thought. One shape. One possibility."],
+        [0.13, "02 / FORM", "A thought<br>takes <em>shape.</em>", "A single form begins to unfold."],
+        [0.27, "03 / EXPLORE", "More than<br>one <em>possibility.</em>", "One shape becomes a world of ideas."],
+        [0.42, "04 / BUILD", "Pieces become<br><em>something bigger.</em>", "Every element finds its place."],
+        [0.57, "05 / CREATE", "From abstract<br>to <em>real.</em>", "A concept becomes something tangible."],
+        [0.72, "06 / EXPERIENCE", "Built to be<br><em>experienced.</em>", "Technology meets design."],
+        [0.86, "07 / MARST", "Ideas into<br><em>reality.</em>", "I build what I imagine."]
+    ];
+
+    function updateCaption(p) {
+        let index = 0;
 
         for (let i = 0; i < captions.length; i++) {
-            if (progress >= captions[i].point) {
-                targetIndex = i;
-            }
+            if (p >= captions[i][0]) index = i;
         }
 
-        if (targetIndex === activeCaption) return;
+        if (index === activeCaption) return;
+        activeCaption = index;
 
-        activeCaption = targetIndex;
-
-        const item = captions[targetIndex];
+        const c = captions[index];
 
         if (!caption) return;
 
         caption.style.opacity = "0";
-        caption.style.transform = "translateY(12px)";
+        caption.style.transform = "translateY(18px)";
 
-        requestAnimationFrame(() => {
+        setTimeout(() => {
+            if (!caption.isConnected) return;
+
             const indexEl = caption.querySelector(".story-caption-index");
             const titleEl = caption.querySelector("h2");
-            const descriptionEl = caption.querySelector("p");
+            const descEl = caption.querySelector("p");
 
-            if (indexEl) indexEl.innerHTML = item.index;
-            if (titleEl) titleEl.innerHTML = item.title;
-            if (descriptionEl) descriptionEl.textContent = item.description;
+            if (indexEl) indexEl.textContent = c[1];
+            if (titleEl) titleEl.innerHTML = c[2];
+            if (descEl) descEl.textContent = c[3];
 
-            requestAnimationFrame(() => {
-                caption.style.opacity = "1";
-                caption.style.transform = "translateY(0)";
-            });
-        });
+            caption.style.opacity = "1";
+            caption.style.transform = "translateY(0)";
+        }, 180);
     }
 
-    // ----------------------------------------
-    // Drawing
-    // ----------------------------------------
+    // ==============================
+    // CAMERA
+    // ==============================
 
-    function clear() {
-        ctx.fillStyle = "#080908";
-        ctx.fillRect(0, 0, width, height);
+    function updateCamera(p) {
+        const expansion = smooth(0.1, 0.55, p);
+        const layout = smooth(0.55, 0.82, p);
+        const final = smooth(0.82, 1, p);
+
+        const mobile = window.innerWidth < 768;
+
+        const initialX = mobile ? 0 : 1.2;
+        const expandedX = mobile ? 0 : 2.5;
+        const serviceX = 0;
+
+        camera.position.x = lerp(initialX, expandedX, expansion);
+        camera.position.x = lerp(camera.position.x, serviceX, layout);
+
+        camera.position.y = Math.sin(p * Math.PI * 2) * 0.4;
+        camera.position.z = lerp(13, 19, expansion);
+        camera.position.z = lerp(camera.position.z, 16, layout);
+        camera.position.z = lerp(camera.position.z, 12, final);
+
+        camera.lookAt(0, 0, 0);
+
+        camera.fov = lerp(38, 52, expansion);
+        camera.fov = lerp(camera.fov, 43, layout);
+        camera.updateProjectionMatrix();
     }
 
-    function drawGrid(progress) {
-        const spacing = isMobile() ? 32 : 48;
+    // ==============================
+    // MORPH
+    // ==============================
 
-        const fade = 1 - smoothstep(0.5, 0.9, progress);
+    function updateObjects(p) {
+        const expansion = smooth(0.08, 0.52, p);
+        const architecture = smooth(0.32, 0.75, p);
+        const interfacePhase = smooth(0.64, 0.88, p);
+        const finalPhase = smooth(0.85, 1, p);
 
-        ctx.strokeStyle = `rgba(255,255,255,${0.035 * fade})`;
-        ctx.lineWidth = 1;
+        // Original cube
+        mainObject.scale.setScalar(lerp(1, 0.25, expansion));
+        mainObject.rotation.x = p * 2.3;
+        mainObject.rotation.y = p * 3.2;
+        mainObject.rotation.z = p * 1.4;
+        mainObject.position.y = Math.sin(p * 6) * 0.2;
 
-        for (let x = 0; x < width; x += spacing) {
-            ctx.beginPath();
-            ctx.moveTo(x, 0);
-            ctx.lineTo(x, height);
-            ctx.stroke();
-        }
+        mainCube.material = p < 0.5 ? limeMetal : silver;
 
-        for (let y = 0; y < height; y += spacing) {
-            ctx.beginPath();
-            ctx.moveTo(0, y);
-            ctx.lineTo(width, y);
-            ctx.stroke();
-        }
-    }
+        innerCube.scale.setScalar(lerp(1, 0.35, expansion));
+        innerCube.rotation.x = -p * 3;
+        innerCube.rotation.y = p * 4;
 
-    function drawGlow(cx, cy, radius, opacity) {
-        const gradient = ctx.createRadialGradient(
-            cx, cy, 0,
-            cx, cy, radius
-        );
+        cubeWire.scale.setScalar(lerp(1, 2.4, expansion));
+        cubeWire.rotation.copy(mainObject.rotation);
 
-        gradient.addColorStop(0, `rgba(223,255,114,${opacity})`);
-        gradient.addColorStop(0.4, `rgba(150,180,70,${opacity * 0.3})`);
-        gradient.addColorStop(1, "rgba(8,9,8,0)");
+        core.scale.setScalar(lerp(1, 0.6, expansion));
 
-        ctx.fillStyle = gradient;
-        ctx.fillRect(0, 0, width, height);
-    }
+        // Multi cubes: explosion -> architecture -> service
+        modules.forEach((item) => {
+            const { group, start, end, service } = item;
 
-    function drawSquare(progress, cx, cy, size) {
-        const rotation = progress * Math.PI * 2.5;
+            const target = new THREE.Vector3()
+                .copy(start)
+                .lerp(end, expansion)
+                .lerp(service, interfacePhase);
 
-        const corner = lerp(0, size * 0.48, segment(0.1, 0.42, progress));
-        const stretchX = lerp(1, 2.8, segment(0.3, 0.6, progress));
-        const stretchY = lerp(1, 0.48, segment(0.3, 0.6, progress));
+            const wave = Math.sin(p * 10 + item.phase) * (1 - architecture) * 0.45;
 
-        ctx.save();
+            target.y += wave;
 
-        ctx.translate(cx, cy);
-        ctx.rotate(rotation);
-        ctx.scale(stretchX, stretchY);
+            group.position.copy(target);
 
-        ctx.beginPath();
-
-        const half = size / 2;
-
-        ctx.moveTo(-half + corner, -half);
-        ctx.lineTo(half - corner, -half);
-        ctx.quadraticCurveTo(half, -half, half, -half + corner);
-
-        ctx.lineTo(half, half - corner);
-        ctx.quadraticCurveTo(half, half, half - corner, half);
-
-        ctx.lineTo(-half + corner, half);
-        ctx.quadraticCurveTo(-half, half, -half, half - corner);
-
-        ctx.lineTo(-half, -half + corner);
-        ctx.quadraticCurveTo(-half, -half, -half + corner, -half);
-
-        ctx.closePath();
-
-        const fade = 1 - segment(0.72, 0.96, progress);
-
-        ctx.strokeStyle = `rgba(223,255,114,${fade})`;
-        ctx.lineWidth = 2;
-        ctx.stroke();
-
-        ctx.fillStyle = `rgba(223,255,114,${0.025 * fade})`;
-        ctx.fill();
-
-        ctx.restore();
-    }
-
-    function drawNetwork(progress, cx, cy, size) {
-        const spread = lerp(size * 0.5, width * 0.48, segment(0.15, 0.6, progress));
-        const count = 24;
-
-        const nodes = [];
-
-        for (let i = 0; i < count; i++) {
-            const angle = (Math.PI * 2 / count) * i;
-            const drift = Math.sin(i * 3.1 + progress * 8) * 30;
-
-            const r = spread + drift;
-
-            nodes.push({
-                x: cx + Math.cos(angle) * r,
-                y: cy + Math.sin(angle) * r,
-                angle
-            });
-        }
-
-        const alpha = segment(0.18, 0.5, progress) *
-            (1 - segment(0.8, 1, progress));
-
-        ctx.lineWidth = 0.7;
-        ctx.strokeStyle = `rgba(223,255,114,${alpha * 0.25})`;
-
-        // 원형 네트워크
-        for (let i = 0; i < nodes.length; i++) {
-            const a = nodes[i];
-            const b = nodes[(i + 1) % nodes.length];
-
-            ctx.beginPath();
-            ctx.moveTo(a.x, a.y);
-            ctx.lineTo(b.x, b.y);
-            ctx.stroke();
-        }
-
-        // 내부 연결
-        for (let i = 0; i < nodes.length; i++) {
-            for (let j = i + 2; j < nodes.length; j += 4) {
-                const a = nodes[i];
-                const b = nodes[j];
-
-                ctx.strokeStyle = `rgba(223,255,114,${alpha * 0.1})`;
-
-                ctx.beginPath();
-                ctx.moveTo(a.x, a.y);
-                ctx.lineTo(b.x, b.y);
-                ctx.stroke();
-            }
-        }
-
-        // 노드
-        nodes.forEach((node, i) => {
-            const pulse = 1 + Math.sin(progress * 15 + i) * 0.5;
-
-            ctx.beginPath();
-            ctx.arc(node.x, node.y, 1.4 * pulse, 0, Math.PI * 2);
-
-            ctx.fillStyle = `rgba(223,255,114,${alpha * 0.6})`;
-            ctx.fill();
-        });
-    }
-
-    function drawOrbit(progress, cx, cy, size) {
-        const opacity = segment(0.35, 0.65, progress) *
-            (1 - segment(0.85, 1, progress));
-
-        const orbitSize = lerp(size, width * 0.45, progress);
-
-        ctx.save();
-        ctx.translate(cx, cy);
-        ctx.rotate(progress * 1.3);
-
-        for (let i = 0; i < 3; i++) {
-            ctx.beginPath();
-            ctx.ellipse(
-                0, 0,
-                orbitSize * (1 + i * 0.13),
-                orbitSize * (0.42 + i * 0.1),
-                i * 0.7,
-                0,
-                Math.PI * 2
+            group.rotation.x = lerp(
+                item.startRotation.x,
+                item.endRotation.x,
+                expansion
             );
 
-            ctx.strokeStyle = `rgba(223,255,114,${opacity * 0.18})`;
-            ctx.lineWidth = 1;
-            ctx.stroke();
-        }
-
-        ctx.restore();
-    }
-
-    function drawCode(progress) {
-        const p = segment(0.45, 0.7, progress);
-        const fade = 1 - segment(0.86, 1, progress);
-
-        if (p <= 0) return;
-
-        const lines = [
-            "const idea = new Possibility();",
-            "idea.connect(design);",
-            "idea.connect(technology);",
-            "idea.build();",
-            "return reality;"
-        ];
-
-        const startX = width * 0.58;
-        const startY = height * 0.38;
-
-        ctx.save();
-
-        ctx.globalAlpha = p * fade * 0.6;
-
-        ctx.font = isMobile() ? "10px monospace" : "13px monospace";
-
-        lines.forEach((line, index) => {
-            const lineProgress = clamp(p * 1.4 - index * 0.14);
-
-            ctx.fillStyle = index === 4
-                ? "#dfff72"
-                : "rgba(255,255,255,.4)";
-
-            ctx.fillText(
-                line.substring(0, Math.floor(line.length * lineProgress)),
-                startX,
-                startY + index * 26
+            group.rotation.y = lerp(
+                item.startRotation.y,
+                item.endRotation.y,
+                expansion
             );
+
+            group.rotation.z = lerp(
+                item.startRotation.z,
+                item.endRotation.z,
+                expansion
+            );
+
+            // UI formation becomes more aligned
+            group.rotation.x = lerp(group.rotation.x, 0, interfacePhase);
+            group.rotation.y = lerp(group.rotation.y, 0, interfacePhase);
+            group.rotation.z = lerp(group.rotation.z, 0, interfacePhase);
+
+            const scale = lerp(item.scaleStart, item.scaleEnd, expansion);
+            group.scale.setScalar(scale);
+
+            group.scale.multiplyScalar(lerp(1, 0.72, interfacePhase));
+            group.scale.multiplyScalar(lerp(1, 0.2, finalPhase));
         });
 
-        ctx.restore();
-    }
+        // Metal platforms
+        plates.forEach((item, i) => {
+            const { mesh, start, end, phase } = item;
 
-    function drawInterface(progress) {
-        const p = segment(0.62, 0.82, progress);
-        const fade = 1 - segment(0.93, 1, progress);
+            mesh.position.copy(start).lerp(end, expansion);
 
-        if (p <= 0) return;
+            mesh.position.y += Math.sin(p * 5 + phase) * 0.3;
 
-        const panelWidth = Math.min(width * 0.58, 620);
-        const panelHeight = Math.min(height * 0.45, 360);
+            mesh.rotation.x = lerp(mesh.rotation.x, 0, interfacePhase);
+            mesh.rotation.z = lerp(mesh.rotation.z, 0, interfacePhase);
 
-        const x = width * 0.5 - panelWidth * 0.5;
-        const y = height * 0.5 - panelHeight * 0.5;
+            mesh.scale.setScalar(lerp(0.2, 1.2, expansion));
+            mesh.scale.multiplyScalar(lerp(1, 0.3, finalPhase));
+        });
 
-        ctx.save();
+        // Rings
+        rings.forEach((item, i) => {
+            const { mesh, initialScale } = item;
 
-        ctx.globalAlpha = p * fade;
-
-        ctx.strokeStyle = "rgba(255,255,255,.12)";
-        ctx.lineWidth = 1;
-
-        ctx.strokeRect(x, y, panelWidth, panelHeight);
-
-        ctx.fillStyle = "#111411";
-        ctx.fillRect(x, y, panelWidth, panelHeight);
-
-        // UI Header
-        ctx.fillStyle = "#dfff72";
-        ctx.fillRect(x + 20, y + 20, 35, 3);
-
-        ctx.fillStyle = "rgba(255,255,255,.2)";
-        ctx.fillRect(x + 20, y + 36, panelWidth * 0.25, 2);
-
-        // UI Content
-        const rows = 4;
-
-        for (let i = 0; i < rows; i++) {
-            const rowY = y + 80 + i * 55;
-
-            ctx.fillStyle = "rgba(255,255,255,.04)";
-            ctx.fillRect(x + 20, rowY, panelWidth - 40, 38);
-
-            ctx.fillStyle = i === 0
-                ? "rgba(223,255,114,.7)"
-                : "rgba(255,255,255,.12)";
-
-            ctx.fillRect(
-                x + 35,
-                rowY + 12,
-                (panelWidth - 80) * (0.35 + i * 0.1),
-                3
+            mesh.scale.setScalar(
+                initialScale * lerp(0.5, 2.5 + i * 0.2, expansion)
             );
-        }
 
-        ctx.restore();
+            mesh.rotation.x += 0.001 * (i + 1);
+            mesh.rotation.y += 0.002 * (i + 1);
+
+            mesh.material.opacity = 0.2 * (1 - finalPhase);
+        });
+
+        // Particles drift
+        const positions = particleGeometry.attributes.position.array;
+
+        particleSeeds.forEach((s, i) => {
+            const drift = expansion * 1.4;
+
+            positions[i * 3] = s.x + Math.sin(p * s.speed + s.phase) * drift;
+            positions[i * 3 + 1] = s.y + Math.cos(p * s.speed + s.phase) * drift;
+            positions[i * 3 + 2] = s.z;
+        });
+
+        particleGeometry.attributes.position.needsUpdate = true;
+
+        particleMaterial.opacity = lerp(0.5, 0.15, finalPhase);
     }
 
-    function drawParticles(progress, cx, cy) {
-        const alpha = 1 - segment(0.8, 1, progress);
-        const count = 70;
+    // ==============================
+    // ANIMATION
+    // ==============================
 
-        for (let i = 0; i < count; i++) {
-            const seed = i * 127.1;
+    function render() {
+        updateObjects(progress);
+        updateCamera(progress);
 
-            const x = (Math.sin(seed) * 0.5 + 0.5) * width;
-            const y = (Math.cos(seed * 0.73) * 0.5 + 0.5) * height;
+        world.rotation.y = lerp(-0.2, 0.18, progress);
+        world.rotation.x = Math.sin(progress * Math.PI) * 0.08;
 
-            const movement = Math.sin(progress * 10 + i) * 15;
-
-            ctx.beginPath();
-            ctx.arc(x + movement, y, 1, 0, Math.PI * 2);
-
-            ctx.fillStyle = `rgba(223,255,114,${alpha * 0.2})`;
-            ctx.fill();
-        }
+        renderer.render(scene, camera);
     }
 
-    function drawFinal(progress) {
-        const p = segment(0.84, 1, progress);
+    // ==============================
+    // RESIZE
+    // ==============================
 
-        if (p <= 0) return;
+    function resize() {
+        width = window.innerWidth;
+        height = window.innerHeight;
 
-        const cx = width / 2;
-        const cy = height / 2;
-        const radius = lerp(20, Math.max(width, height) * 0.38, p);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
+        renderer.setSize(width, height, false);
 
-        ctx.save();
+        camera.aspect = width / height;
+        camera.updateProjectionMatrix();
 
-        ctx.globalAlpha = p;
-
-        ctx.strokeStyle = "#dfff72";
-        ctx.lineWidth = 1.5;
-
-        ctx.beginPath();
-        ctx.arc(cx, cy, radius, 0, Math.PI * 2);
-        ctx.stroke();
-
-        ctx.fillStyle = "rgba(223,255,114,.025)";
-        ctx.fill();
-
-        ctx.font = `bold ${isMobile() ? 38 : 70}px sans-serif`;
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-
-        ctx.fillStyle = "#f4f5ef";
-        ctx.fillText("MARST", cx, cy);
-
-        ctx.restore();
+        render();
     }
 
-    function draw(progress) {
-        if (!ctx || !width || !height) return;
-
-        clear();
-
-        const cx = width * (isMobile() ? 0.5 : 0.58);
-        const cy = height * 0.5;
-
-        const baseSize = Math.min(width, height) * 0.2;
-
-        drawGrid(progress);
-        drawGlow(cx, cy, Math.max(width, height) * 0.6, 0.09);
-        drawParticles(progress, cx, cy);
-        drawSquare(progress, cx, cy, baseSize);
-        drawNetwork(progress, cx, cy, baseSize);
-        drawOrbit(progress, cx, cy, baseSize);
-        drawCode(progress);
-        drawInterface(progress);
-        drawFinal(progress);
-
-        updateCaption(progress);
-
-        if (progressBar) {
-            progressBar.style.width = (progress * 100) + "%";
-        }
-
-        if (progressNumber) {
-            progressNumber.textContent =
-                String(Math.round(progress * 100)).padStart(3, "0");
-        }
-    }
-
-    // ----------------------------------------
-    // Scroll handler
-    // ----------------------------------------
-
-    function update() {
-        updatePin();
-        draw(scrollProgress);
-    }
+    // ==============================
+    // SCROLL LOOP
+    // ==============================
 
     function onScroll() {
-        if (rafId) return;
+        if (frame) return;
 
-        rafId = requestAnimationFrame(() => {
-            rafId = 0;
-            update();
+        frame = requestAnimationFrame(() => {
+            frame = 0;
+
+            updatePin();
+
+            render();
+
+            updateCaption(progress);
+
+            if (progressBar) {
+                progressBar.style.width = `${progress * 100}%`;
+            }
+
+            if (progressNumber) {
+                progressNumber.textContent = String(
+                    Math.round(progress * 100)
+                ).padStart(3, "0");
+            }
         });
     }
 
-    function onResize() {
-        resizeCanvas();
-        update();
-    }
-
-    // ----------------------------------------
-    // Init
-    // ----------------------------------------
+    // ==============================
+    // INIT
+    // ==============================
 
     section.style.position = "relative";
     section.style.overflow = "visible";
 
     stage.classList.remove("story-pinned", "story-ended");
-
     stage.style.position = "absolute";
     stage.style.top = "0";
     stage.style.left = "0";
@@ -693,19 +770,10 @@ export function initScrollScene() {
     stage.style.width = "100%";
     stage.style.height = "100vh";
 
-    resizeCanvas();
-    update();
+    resize();
 
-    window.addEventListener("scroll", onScroll, {
-        passive: true
-    });
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", resize);
 
-    window.addEventListener("resize", onResize);
-
-    window.addEventListener("orientationchange", onResize);
-
-    resizeObserver = new ResizeObserver(onResize);
-    resizeObserver.observe(section);
-
-    console.log("[MARST SCENE] JS Pin System Ready");
+    console.log("[MARST] 3D Scroll Experience Initialized");
 }
