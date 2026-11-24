@@ -1,84 +1,213 @@
 
-const clamp = (value, min = 0, max = 1) =>
-    Math.max(min, Math.min(max, value));
-
-const lerp = (a, b, t) => a + (b - a) * t;
-
-const smoothstep = t => t * t * (3 - 2 * t);
-
 export function initScrollScene() {
-    const section = document.getElementById("scroll-scene");
-    if (!section) return;
+  const section = document.querySelector("#experience");
+  if (!section) return;
 
-    const object = document.getElementById("scene-object");
-    const copies = [...section.querySelectorAll(".scene-copy")];
-    const progressBar = document.getElementById("scene-progress-bar");
-    const percent = document.getElementById("scene-percent");
-    const number = document.getElementById("scene-number");
+  const object = document.querySelector("#transform-object");
+  const square = document.querySelector("#transform-square");
+  const browser = document.querySelector("#browser-window");
+  const editor = document.querySelector("#code-editor");
+  const service = document.querySelector("#service-ui");
+  const finalObject = document.querySelector("#final-object");
 
-    if (!object || copies.length === 0) return;
+  const texts = [
+    document.querySelector(".text-stage-1"),
+    document.querySelector(".text-stage-2"),
+    document.querySelector(".text-stage-3"),
+    document.querySelector(".text-stage-4"),
+    document.querySelector(".text-stage-5")
+  ];
 
-    let ticking = false;
+  const progressBar = document.querySelector("#experience-progress-bar");
+  const stepLabel = document.querySelector("#experience-step");
+  const statusLabel = document.querySelector("#experience-status");
 
-    function update() {
-        const rect = section.getBoundingClientRect();
-        const scrollable = section.offsetHeight - window.innerHeight;
+  if (!object || !square || !browser || !editor || !service || !finalObject) {
+    console.warn("[MARST] Scroll experience elements missing.");
+    return;
+  }
 
-        const progress = clamp(-rect.top / Math.max(1, scrollable));
-        const p = progress;
+  let ticking = false;
+  let lastProgress = -1;
 
-        // Object cinematic motion
-        const scale = lerp(0.25, 2.7, smoothstep(clamp(p / 0.30)));
-        const rotation = lerp(0, 220, p);
-        const moveX = lerp(0, -window.innerWidth * 0.22, clamp((p - 0.55) / 0.35));
-        const moveY = lerp(0, -window.innerHeight * 0.12, clamp(p / 0.85));
+  const clamp = (value, min = 0, max = 1) =>
+    Math.min(max, Math.max(min, value));
 
-        object.style.transform =
-            `translate(calc(-50% + ${moveX}px), calc(-50% + ${moveY}px)) ` +
-            `scale(${scale}) rotate(${rotation}deg)`;
+  const smooth = (value) => {
+    value = clamp(value);
+    return value * value * (3 - 2 * value);
+  };
 
-        object.style.opacity = String(lerp(1, 0.14, clamp((p - 0.72) / 0.25)));
+  const lerp = (a, b, t) => a + (b - a) * t;
 
-        // Copy sequence
-        const segment = 1 / copies.length;
+  const range = (progress, start, end) => {
+    return smooth(clamp((progress - start) / (end - start)));
+  };
 
-        copies.forEach((copy, index) => {
-            const start = index * segment;
-            const local = (p - start) / segment;
+  function update() {
+    ticking = false;
 
-            const fadeIn = smoothstep(clamp(local / 0.20));
-            const fadeOut = 1 - smoothstep(clamp((local - 0.72) / 0.20));
-            const opacity = fadeIn * fadeOut;
+    const rect = section.getBoundingClientRect();
+    const total = section.offsetHeight - window.innerHeight;
 
-            const y = lerp(35, 0, fadeIn);
-            const scaleText = lerp(0.96, 1, fadeIn);
+    const progress = clamp(
+      -rect.top / Math.max(total, 1)
+    );
 
-            copy.style.opacity = String(opacity);
-            copy.style.transform =
-                `translate(-50%, calc(-50% + ${y}px)) scale(${scaleText})`;
-        });
+    if (Math.abs(progress - lastProgress) < 0.0005) return;
+    lastProgress = progress;
 
-        const current = Math.min(
-            copies.length,
-            Math.floor(p * copies.length) + 1
-        );
+    const p = progress;
 
-        if (number) number.textContent = String(current).padStart(2, "0");
-        if (percent) percent.textContent = `${Math.round(p * 100)}%`;
-        if (progressBar) progressBar.style.width = `${p * 100}%`;
+    // Timeline stages
+    const move = range(p, 0.00, 0.17);
+    const morph = range(p, 0.12, 0.30);
+    const browserIn = range(p, 0.23, 0.43);
+    const browserOut = 1 - range(p, 0.40, 0.52);
+    const codeIn = range(p, 0.38, 0.57);
+    const codeOut = 1 - range(p, 0.55, 0.68);
+    const serviceIn = range(p, 0.63, 0.82);
+    const serviceOut = 1 - range(p, 0.80, 0.90);
+    const finalIn = range(p, 0.86, 0.99);
 
-        ticking = false;
+    // Square movement
+    const squareX = lerp(-240, 0, move);
+    const squareY = lerp(100, -20, move);
+    const squareScale = lerp(0.35, 1.25, move);
+    const squareRotate = lerp(-45, 180, move);
+
+    object.style.transform = `
+      translate3d(${squareX}px, ${squareY}px, 0)
+      scale(${squareScale})
+      rotate(${squareRotate}deg)
+    `;
+
+    // Square morphing
+    const radius = lerp(0, 24, morph);
+    const border = lerp(1, 2.5, morph);
+
+    square.style.borderRadius = `${radius}%`;
+    square.style.borderWidth = `${border}px`;
+    square.style.opacity = 1 - browserIn * 0.95;
+
+    square.style.setProperty("--square-morph", morph);
+
+    // Orbital geometry
+    section.style.setProperty("--scroll-progress", p);
+
+    const orbitSpin = p * 500;
+
+    document.querySelectorAll(".object-orbit").forEach((orbit, index) => {
+      orbit.style.transform = `
+        rotate(${orbitSpin * (index % 2 ? -1 : 1)}deg)
+      `;
+    });
+
+    // Browser transformation
+    browser.style.opacity = browserIn * browserOut;
+    browser.style.transform = `
+      translate3d(
+        ${lerp(160, 0, browserIn)}px,
+        ${lerp(80, 0, browserIn)}px,
+        0
+      )
+      scale(${lerp(0.55, 1, browserIn)})
+      rotate(${lerp(8, 0, browserIn)}deg)
+    `;
+
+    browser.style.filter = `blur(${lerp(8, 0, browserIn)}px)`;
+
+    // Editor
+    editor.style.opacity = codeIn * codeOut;
+    editor.style.transform = `
+      translate3d(
+        ${lerp(-140, 0, codeIn)}px,
+        ${lerp(80, 0, codeIn)}px,
+        0
+      )
+      scale(${lerp(0.7, 1, codeIn)})
+      rotate(${lerp(-5, 0, codeIn)}deg)
+    `;
+
+    editor.style.filter = `blur(${lerp(6, 0, codeIn)}px)`;
+
+    // Service UI
+    service.style.opacity = serviceIn * serviceOut;
+    service.style.transform = `
+      translate3d(
+        0,
+        ${lerp(180, 0, serviceIn)}px,
+        0
+      )
+      scale(${lerp(0.7, 1, serviceIn)})
+      rotateX(${lerp(10, 0, serviceIn)}deg)
+    `;
+
+    service.style.filter = `blur(${lerp(8, 0, serviceIn)}px)`;
+
+    // Final object
+    finalObject.style.opacity = finalIn;
+    finalObject.style.transform = `
+      translate3d(0, ${lerp(100, 0, finalIn)}px, 0)
+      scale(${lerp(0.2, 1, finalIn)})
+      rotate(${lerp(-90, 0, finalIn)}deg)
+    `;
+
+    // Square fades as final object appears
+    object.style.opacity = 1 - finalIn;
+
+    // Copy stage switching
+    const stageIndex = Math.min(
+      4,
+      Math.floor(p * 5)
+    );
+
+    texts.forEach((text, index) => {
+      if (!text) return;
+
+      const active = index === stageIndex;
+      text.style.opacity = active ? 1 : 0;
+      text.style.transform = active
+        ? "translate3d(0,0,0)"
+        : "translate3d(0,30px,0)";
+      text.style.visibility = active ? "visible" : "hidden";
+    });
+
+    // Status
+    const stageNames = [
+      "INITIALIZING",
+      "TRANSFORMING",
+      "GENERATING CODE",
+      "BUILDING EXPERIENCE",
+      "CREATION COMPLETE"
+    ];
+
+    if (statusLabel) {
+      statusLabel.textContent = stageNames[stageIndex];
     }
 
-    function requestUpdate() {
-        if (!ticking) {
-            ticking = true;
-            requestAnimationFrame(update);
-        }
+    if (stepLabel) {
+      stepLabel.textContent =
+        `${String(stageIndex + 1).padStart(2, "0")} / 05`;
     }
 
-    window.addEventListener("scroll", requestUpdate, { passive: true });
-    window.addEventListener("resize", requestUpdate);
+    if (progressBar) {
+      progressBar.style.width = `${p * 100}%`;
+    }
 
-    update();
+    // Square becomes more complex while moving
+    const rotation = p * 720;
+    square.style.setProperty("--square-rotation", `${rotation}deg`);
+  }
+
+  function requestUpdate() {
+    if (ticking) return;
+    ticking = true;
+    requestAnimationFrame(update);
+  }
+
+  window.addEventListener("scroll", requestUpdate, { passive: true });
+  window.addEventListener("resize", requestUpdate);
+
+  update();
 }
