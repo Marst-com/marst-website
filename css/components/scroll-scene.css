@@ -35,9 +35,11 @@
 
 .scroll-story {
   position: relative;
+  display: block;
   height: 900vh;
+  min-height: 900vh;
+  overflow: visible;
   background: #080908;
-  overflow: clip;
 }
 
 .story-sticky {
