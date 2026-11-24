@@ -436,7 +436,7 @@ export function initScrollScene() {
         stage.style.right = "0";
         stage.style.width = "100vw";
         stage.style.height = "100vh";
-        stage.style.zIndex = "99999";
+        stage.style.zIndex = "20";
 
         currentMode = "pinned";
     }
